@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { ThemeProvider } from './contexts/ThemeProvider'
-import { InstanceProvider } from './contexts/InstanceContext'
-import { PaginationProvider } from './contexts/PaginationContext'
+import { InstanceProvider } from './contexts/InstanceContext.tsx'
+import { PaginationProvider } from './contexts/PaginationContext.tsx'
 import { Layout } from './components/Layout'
 import { AuthForm } from './components/AuthForm'
 import { InstanceManager } from './components/InstanceManager'
@@ -56,6 +57,7 @@ function setHash(tab: Tab, instanceId: number | null, tool?: Tool) {
 }
 
 export default function App() {
+	const { t } = useTranslation()
 	const [view, setView] = useState<View>('loading')
 	const [user, setUser] = useState<User | null>(null)
 	const [currentInstance, setCurrentInstance] = useState<Instance | null>(null)
@@ -176,7 +178,7 @@ export default function App() {
 			<ThemeProvider>
 				<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-primary)' }}>
 					<div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-						Loading...
+						{t('common.loading')}
 					</div>
 				</div>
 			</ThemeProvider>
