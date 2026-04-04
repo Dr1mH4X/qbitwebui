@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	ChevronDown,
 	ArrowDown,
@@ -103,6 +104,7 @@ function useAltSpeedMode(instanceId: number) {
 }
 
 export function StatusBar() {
+	const { t } = useTranslation()
 	const instance = useInstance()
 	const { data } = useTransferInfo()
 	const { data: syncData } = useSyncMaindata()
@@ -110,9 +112,9 @@ export function StatusBar() {
 	const altSpeed = useAltSpeedMode(instance.id)
 
 	const statusConfig = {
-		connected: { label: 'Connected', type: 'success' as const },
-		firewalled: { label: 'Firewalled', type: 'warning' as const },
-		disconnected: { label: 'Disconnected', type: 'error' as const },
+		connected: { label: t('statusBar.connected'), type: 'success' as const },
+		firewalled: { label: t('statusBar.firewalled'), type: 'warning' as const },
+		disconnected: { label: t('statusBar.disconnected'), type: 'error' as const },
 	}[data?.connection_status ?? 'disconnected']
 
 	const statusColors = {
@@ -169,7 +171,7 @@ export function StatusBar() {
 									backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)',
 									color: 'var(--accent)',
 								}}
-								title={`Download limit: ${formatSpeed(data?.dl_rate_limit ?? 0)}`}
+								title={`${t('statusBar.downloadLimit')}: ${formatSpeed(data?.dl_rate_limit ?? 0)}`}
 							>
 								{formatLimit(data?.dl_rate_limit ?? 0)}
 							</span>
@@ -187,7 +189,7 @@ export function StatusBar() {
 									backgroundColor: 'color-mix(in srgb, var(--warning) 20%, transparent)',
 									color: 'var(--warning)',
 								}}
-								title={`Upload limit: ${formatSpeed(data?.up_rate_limit ?? 0)}`}
+								title={`${t('statusBar.uploadLimit')}: ${formatSpeed(data?.up_rate_limit ?? 0)}`}
 							>
 								{formatLimit(data?.up_rate_limit ?? 0)}
 							</span>
@@ -208,14 +210,10 @@ export function StatusBar() {
 						color: altSpeed.enabled ? 'var(--accent)' : 'var(--text-muted)',
 						opacity: altSpeed.toggling ? 0.5 : 1,
 					}}
-					title={
-						altSpeed.enabled
-							? 'Alternative speed limits active (click to disable)'
-							: 'Click to enable alternative speed limits'
-					}
+					title={altSpeed.enabled ? t('statusBar.altSpeedActive') : t('statusBar.altSpeedInactive')}
 				>
 					<Zap className="w-3.5 h-3.5" strokeWidth={2} />
-					<span>Alt</span>
+					<span>{t('statusBar.alt')}</span>
 				</button>
 			</div>
 
@@ -239,7 +237,9 @@ export function StatusBar() {
 					</button>
 				</div>
 				<span className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
-					{startItem}-{endItem} of {totalItems}
+					{startItem}-{endItem}
+					{t('statusBar.of')}
+					{totalItems}
 				</span>
 				<div className="flex items-center gap-1">
 					<button
@@ -268,7 +268,7 @@ export function StatusBar() {
 					style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)' }}
 				>
 					<span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Total
+						{t('statusBar.total')}
 					</span>
 					<span className="text-xs font-mono" style={{ color: 'var(--accent)' }}>
 						{formatSize(syncData?.server_state.alltime_dl ?? 0)}
@@ -285,7 +285,7 @@ export function StatusBar() {
 					style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)' }}
 				>
 					<span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						DHT
+						{t('statusBar.dht')}
 					</span>
 					<span className="text-xs font-mono font-medium" style={{ color: 'var(--text-secondary)' }}>
 						{data?.dht_nodes ?? 0}

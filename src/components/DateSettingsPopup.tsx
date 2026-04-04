@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Checkbox } from './ui'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function DateSettingsPopup({ anchor, hideTime, onSave, onClose }: Props) {
+	const { t } = useTranslation()
 	const ref = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -43,7 +45,7 @@ export function DateSettingsPopup({ anchor, hideTime, onSave, onClose }: Props) 
 			}}
 		>
 			<Checkbox
-				label="Hide time"
+				label={t('dateSettings.hideTime')}
 				checked={hideTime}
 				onChange={(checked) => {
 					onSave(checked)

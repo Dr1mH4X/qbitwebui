@@ -1,4 +1,5 @@
 import { useState, useEffect, Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Plus, Trash2, ChevronDown, Filter, X } from 'lucide-react'
 import {
 	getIntegrations,
@@ -19,19 +20,20 @@ import { getCategories, type Category } from '../api/qbittorrent'
 import { formatSize } from '../utils/format'
 import { extractTags, sortResults, filterResults, type SortKey } from '../utils/search'
 
-function formatAge(dateStr: string): string {
-	const date = new Date(dateStr)
-	const now = new Date()
-	const diff = now.getTime() - date.getTime()
-	const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-	if (days === 0) return 'Today'
-	if (days === 1) return '1 day'
-	if (days < 30) return `${days} days`
-	if (days < 365) return `${Math.floor(days / 30)} months`
-	return `${Math.floor(days / 365)} years`
-}
-
 export function SearchPanel() {
+	const { t } = useTranslation()
+
+	function formatAge(dateStr: string): string {
+		const date = new Date(dateStr)
+		const now = new Date()
+		const diff = now.getTime() - date.getTime()
+		const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+		if (days === 0) return t('common.today')
+		if (days === 1) return `1 ${t('searchPanel.days').trim()}`
+		if (days < 30) return `${days}${t('searchPanel.months')}`
+		return `${Math.floor(days / 365)}${t('searchPanel.years')}`
+	}
+
 	const [integrations, setIntegrations] = useState<Integration[]>([])
 	const [instances, setInstances] = useState<Instance[]>([])
 	const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null)
@@ -122,7 +124,7 @@ export function SearchPanel() {
 			})
 			setResults(data)
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Search failed')
+			setError(err instanceof Error ? err.message : t('searchPanel.searchFailed'))
 		} finally {
 			setSearching(false)
 		}
@@ -144,7 +146,7 @@ export function SearchPanel() {
 			setFormData({ label: '', url: '', api_key: '' })
 			setTestResult(null)
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to add integration')
+			setError(err instanceof Error ? err.message : t('searchPanel.failedToAdd'))
 		} finally {
 			setSubmitting(false)
 		}
@@ -161,7 +163,7 @@ export function SearchPanel() {
 			}
 			setDeleteConfirm(null)
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to delete')
+			setError(err instanceof Error ? err.message : t('searchPanel.failedToDelete'))
 		}
 	}
 
@@ -171,12 +173,12 @@ export function SearchPanel() {
 		try {
 			const result = await testIntegrationConnection(formData.url, formData.api_key)
 			if (result.success) {
-				setTestResult({ success: true, message: `Connected! Prowlarr ${result.version}` })
+				setTestResult({ success: true, message: `${t('searchPanel.connected')}${result.version}` })
 			} else {
-				setTestResult({ success: false, message: result.error || 'Connection failed' })
+				setTestResult({ success: false, message: result.error || t('searchPanel.connectionFailed') })
 			}
 		} catch (err) {
-			setTestResult({ success: false, message: err instanceof Error ? err.message : 'Connection failed' })
+			setTestResult({ success: false, message: err instanceof Error ? err.message : t('searchPanel.connectionFailed') })
 		} finally {
 			setTesting(false)
 		}
@@ -226,7 +228,11 @@ export function SearchPanel() {
 			closeGrabModal()
 			setTimeout(() => setGrabResult(null), 3000)
 		} catch (err) {
-			setGrabResult({ guid: grabModal.guid, success: false, message: err instanceof Error ? err.message : 'Failed' })
+			setGrabResult({
+				guid: grabModal.guid,
+				success: false,
+				message: err instanceof Error ? err.message : t('searchPanel.failed'),
+			})
 		} finally {
 			setGrabbing(null)
 		}
@@ -259,14 +265,14 @@ export function SearchPanel() {
 				style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 			>
 				<p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-					No integrations configured
+					{t('searchPanel.noIntegrations')}
 				</p>
 				<button
 					onClick={() => setShowAddForm(true)}
 					className="px-4 py-2 rounded-lg text-sm font-medium"
 					style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 				>
-					Add Integration
+					{t('searchPanel.addIntegration')}
 				</button>
 			</div>
 		)
@@ -280,7 +286,7 @@ export function SearchPanel() {
 					style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 				>
 					<h2 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
-						Add Integration
+						{t('searchPanel.addIntegration')}
 					</h2>
 					<form onSubmit={handleAddIntegration} className="space-y-4">
 						<div className="grid grid-cols-3 gap-4">
@@ -289,7 +295,7 @@ export function SearchPanel() {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Label
+									{t('common.label')}
 								</label>
 								<input
 									type="text"
@@ -301,7 +307,7 @@ export function SearchPanel() {
 										borderColor: 'var(--border)',
 										color: 'var(--text-primary)',
 									}}
-									placeholder="My Prowlarr"
+									placeholder={t('searchPanel.myProwlarr')}
 									required
 								/>
 							</div>
@@ -310,7 +316,7 @@ export function SearchPanel() {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									URL
+									{t('common.url')}
 								</label>
 								<input
 									type="url"
@@ -331,7 +337,7 @@ export function SearchPanel() {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									API Key
+									{t('common.apiKey')}
 								</label>
 								<input
 									type="password"
@@ -368,7 +374,7 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 							>
-								{submitting ? 'Adding...' : 'Add'}
+								{submitting ? t('common.adding') : t('common.add')}
 							</button>
 							<button
 								type="button"
@@ -377,7 +383,7 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm border disabled:opacity-50"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								{testing ? 'Testing...' : 'Test Connection'}
+								{testing ? t('common.testing') : t('common.testConnection')}
 							</button>
 							<button
 								type="button"
@@ -388,7 +394,7 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm border"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 						</div>
 					</form>
@@ -454,7 +460,7 @@ export function SearchPanel() {
 								borderColor: 'var(--border)',
 								color: 'var(--text-primary)',
 							}}
-							placeholder="Search torrents..."
+							placeholder={t('searchPanel.searchPlaceholder')}
 						/>
 					</div>
 					<div className="relative">
@@ -470,8 +476,8 @@ export function SearchPanel() {
 						>
 							<span>
 								{selectedIndexer === '-2'
-									? 'All Indexers'
-									: indexers.find((i) => String(i.id) === selectedIndexer)?.name || 'All Indexers'}
+									? t('searchPanel.allIndexers')
+									: indexers.find((i) => String(i.id) === selectedIndexer)?.name || t('searchPanel.allIndexers')}
 							</span>
 							<ChevronDown
 								className={`w-4 h-4 transition-transform ${indexerDropdownOpen ? 'rotate-180' : ''}`}
@@ -495,7 +501,7 @@ export function SearchPanel() {
 										className="w-full text-left px-4 py-2 text-sm hover:bg-[var(--bg-tertiary)] transition-colors"
 										style={{ color: selectedIndexer === '-2' ? 'var(--accent)' : 'var(--text-primary)' }}
 									>
-										All Indexers
+										{t('searchPanel.allIndexers')}
 									</button>
 									{indexers
 										.filter((i) => i.enable && i.protocol === 'torrent')
@@ -532,8 +538,9 @@ export function SearchPanel() {
 						>
 							<span>
 								{selectedCategory
-									? prowlarrCategories.find((c) => String(c.id) === selectedCategory)?.name || 'All Categories'
-									: 'All Categories'}
+									? prowlarrCategories.find((c) => String(c.id) === selectedCategory)?.name ||
+										t('searchPanel.allCategories')
+									: t('searchPanel.allCategories')}
 							</span>
 							<svg
 								className={`w-4 h-4 transition-transform ${prowlarrCategoryDropdownOpen ? 'rotate-180' : ''}`}
@@ -562,7 +569,7 @@ export function SearchPanel() {
 										className="w-full text-left px-4 py-2 text-sm hover:bg-[var(--bg-tertiary)] transition-colors"
 										style={{ color: selectedCategory === '' ? 'var(--accent)' : 'var(--text-primary)' }}
 									>
-										All Categories
+										{t('searchPanel.allCategories')}
 									</button>
 									{prowlarrCategories.map((category) => (
 										<button
@@ -590,7 +597,7 @@ export function SearchPanel() {
 						className="px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
 						style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 					>
-						{searching ? 'Searching...' : 'Search'}
+						{searching ? t('searchPanel.searching') : t('searchPanel.search')}
 					</button>
 				</form>
 			)}
@@ -611,7 +618,7 @@ export function SearchPanel() {
 									}}
 								>
 									<Filter className="w-4 h-4" style={{ color: 'var(--text-muted)' }} strokeWidth={2} />
-									<span>Filter</span>
+									<span>{t('searchPanel.filter')}</span>
 									<ChevronDown
 										className={`w-3 h-3 transition-transform ${filterDropdownOpen ? 'rotate-180' : ''}`}
 										style={{ color: 'var(--text-muted)' }}
@@ -628,7 +635,7 @@ export function SearchPanel() {
 											<div className="p-2 border-b" style={{ borderColor: 'var(--border)' }}>
 												<input
 													type="text"
-													placeholder="Type to filter..."
+													placeholder={t('common.typeToFilter')}
 													value={filter}
 													onChange={(e) => handleFilterChange(e.target.value)}
 													onClick={(e) => e.stopPropagation()}
@@ -691,31 +698,31 @@ export function SearchPanel() {
 								<thead>
 									<tr style={{ borderBottom: '1px solid var(--border)' }}>
 										<th className="text-left px-4 py-3 font-medium w-[45%]" style={{ color: 'var(--text-muted)' }}>
-											Name
+											{t('columns.name')}
 										</th>
 										<th className="text-left px-4 py-3 font-medium w-[12%]" style={{ color: 'var(--text-muted)' }}>
-											Indexer
+											{t('searchPanel.indexer')}
 										</th>
 										<th
 											className="text-right px-4 py-3 font-medium cursor-pointer hover:text-[var(--text-primary)] w-[10%]"
 											style={{ color: sortKey === 'size' ? 'var(--text-primary)' : 'var(--text-muted)' }}
 											onClick={() => handleSort('size')}
 										>
-											Size {sortKey === 'size' && (sortAsc ? '↑' : '↓')}
+											{t('columns.size')} {sortKey === 'size' && (sortAsc ? '↑' : '↓')}
 										</th>
 										<th
 											className="text-right px-4 py-3 font-medium cursor-pointer hover:text-[var(--text-primary)] w-[10%]"
 											style={{ color: sortKey === 'seeders' ? 'var(--text-primary)' : 'var(--text-muted)' }}
 											onClick={() => handleSort('seeders')}
 										>
-											S/L {sortKey === 'seeders' && (sortAsc ? '↑' : '↓')}
+											{t('searchPanel.sl')} {sortKey === 'seeders' && (sortAsc ? '↑' : '↓')}
 										</th>
 										<th
 											className="text-right px-4 py-3 font-medium cursor-pointer hover:text-[var(--text-primary)] w-[10%]"
 											style={{ color: sortKey === 'age' ? 'var(--text-primary)' : 'var(--text-muted)' }}
 											onClick={() => handleSort('age')}
 										>
-											Age {sortKey === 'age' && (sortAsc ? '↑' : '↓')}
+											{t('searchPanel.age')} {sortKey === 'age' && (sortAsc ? '↑' : '↓')}
 										</th>
 										<th className="px-4 py-3 w-[13%]"></th>
 									</tr>
@@ -731,7 +738,7 @@ export function SearchPanel() {
 												<div className="truncate flex items-center gap-2" title={result.title}>
 													{result.indexerFlags?.some((f) => /free\s*leech|^free$/i.test(f)) && (
 														<span
-															title="Freeleech"
+															title={t('searchPanel.freeleech')}
 															className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-help"
 															style={{
 																backgroundColor: 'color-mix(in srgb, #a6e3a1 20%, transparent)',
@@ -769,11 +776,11 @@ export function SearchPanel() {
 															color: grabResult.success ? '#a6e3a1' : 'var(--error)',
 														}}
 													>
-														{grabResult.success ? 'Added!' : grabResult.message}
+														{grabResult.success ? t('searchPanel.added') : grabResult.message}
 													</span>
 												) : instances.length === 0 ? (
 													<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-														No instances
+														{t('searchPanel.noInstances')}
 													</span>
 												) : (
 													<button
@@ -782,7 +789,7 @@ export function SearchPanel() {
 														className="px-3 py-1 rounded text-xs font-medium disabled:opacity-50"
 														style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 													>
-														{grabbing === result.guid ? '...' : 'Grab'}
+														{grabbing === result.guid ? '...' : t('searchPanel.grab')}
 													</button>
 												)}
 											</td>
@@ -794,13 +801,13 @@ export function SearchPanel() {
 					)}
 					{sortedResults.length === 0 && filter && (
 						<div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
-							No results match "{filter}"
+							{t('searchPanel.noResultsMatch')}"{filter}"
 						</div>
 					)}
 					{totalPages > 1 && (
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								{sortedResults.length} results
+								{sortedResults.length} {t('searchPanel.results')}
 							</span>
 							<div className="flex items-center gap-1">
 								<button
@@ -848,7 +855,7 @@ export function SearchPanel() {
 
 			{results.length === 0 && query && !searching && (
 				<div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-					No results found
+					{t('searchPanel.noResultsFound')}
 				</div>
 			)}
 
@@ -862,12 +869,10 @@ export function SearchPanel() {
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-							Delete Integration
+							{t('searchPanel.deleteIntegration')}
 						</h3>
 						<p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-							Are you sure you want to delete{' '}
-							<strong style={{ color: 'var(--text-primary)' }}>{deleteConfirm.label}</strong>? This action cannot be
-							undone.
+							{t('common.confirmDelete', { name: deleteConfirm.label })}
 						</p>
 						<div className="flex gap-3 justify-end">
 							<button
@@ -875,14 +880,14 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm border"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 							<button
 								onClick={handleDeleteIntegration}
 								className="px-4 py-2 rounded-lg text-sm font-medium"
 								style={{ backgroundColor: 'var(--error)', color: 'var(--accent-contrast)' }}
 							>
-								Delete
+								{t('common.delete')}
 							</button>
 						</div>
 					</div>
@@ -901,7 +906,7 @@ export function SearchPanel() {
 						onClick={(e) => e.stopPropagation()}
 					>
 						<h3 className="text-lg font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
-							Grab Torrent
+							{t('searchPanel.grabTorrent')}
 						</h3>
 						<p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-muted)' }} title={grabModal.title}>
 							{grabModal.title}
@@ -913,7 +918,7 @@ export function SearchPanel() {
 										className="block text-xs font-medium mb-2 uppercase tracking-wider"
 										style={{ color: 'var(--text-muted)' }}
 									>
-										Instance
+										{t('searchPanel.instance')}
 									</label>
 									<div className="relative">
 										<button
@@ -927,7 +932,9 @@ export function SearchPanel() {
 											}}
 										>
 											<span>
-												{grabInstance ? instances.find((i) => i.id === grabInstance)?.label : 'Select instance...'}
+												{grabInstance
+													? instances.find((i) => i.id === grabInstance)?.label
+													: t('searchPanel.selectInstance')}
 											</span>
 											<ChevronDown
 												className={`w-4 h-4 transition-transform ${instanceDropdownOpen ? 'rotate-180' : ''}`}
@@ -973,7 +980,7 @@ export function SearchPanel() {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Category
+									{t('filters.category')}
 								</label>
 								<div className="relative">
 									<button
@@ -987,7 +994,7 @@ export function SearchPanel() {
 											color: grabCategory ? 'var(--text-primary)' : 'var(--text-muted)',
 										}}
 									>
-										<span>{loadingCategories ? 'Loading...' : grabCategory || 'None'}</span>
+										<span>{loadingCategories ? t('common.loading') : grabCategory || t('common.none')}</span>
 										<ChevronDown
 											className={`w-4 h-4 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`}
 											style={{ color: 'var(--text-muted)' }}
@@ -1015,7 +1022,7 @@ export function SearchPanel() {
 															: 'transparent',
 													}}
 												>
-													None
+													{t('common.none')}
 												</button>
 												{Object.keys(grabCategories).map((cat) => (
 													<button
@@ -1047,14 +1054,14 @@ export function SearchPanel() {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Save Path
+									{t('settingsDownloads.defaultSavePath')}
 								</label>
 								<input
 									type="text"
 									value={grabSavepath}
 									onChange={(e) => setGrabSavepath(e.target.value)}
 									disabled={!grabInstance}
-									placeholder="Default"
+									placeholder={t('common.default')}
 									className="w-full px-3 py-2 rounded-lg border text-sm disabled:opacity-50"
 									style={{
 										backgroundColor: 'var(--bg-tertiary)',
@@ -1070,7 +1077,7 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm border"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 							<button
 								onClick={handleGrab}
@@ -1078,7 +1085,7 @@ export function SearchPanel() {
 								className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 							>
-								{grabbing === grabModal.guid ? 'Grabbing...' : 'Grab'}
+								{grabbing === grabModal.guid ? t('searchPanel.grabbing') : t('searchPanel.grab')}
 							</button>
 						</div>
 					</div>

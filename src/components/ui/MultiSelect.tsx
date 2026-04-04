@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import { Checkbox } from './Checkbox'
 
@@ -15,6 +16,7 @@ interface MultiSelectProps {
 }
 
 export function MultiSelect({ options, selected, onChange, placeholder = 'Select...' }: MultiSelectProps) {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 
@@ -80,7 +82,7 @@ export function MultiSelect({ options, selected, onChange, placeholder = 'Select
 						<Checkbox
 							checked={allSelected}
 							onChange={handleSelectAll}
-							label={allSelected ? 'Deselect All' : 'Select All'}
+							label={allSelected ? t('multiSelect.deselectAll') : t('multiSelect.selectAll')}
 						/>
 					</div>
 					{sorted.map((option) => (

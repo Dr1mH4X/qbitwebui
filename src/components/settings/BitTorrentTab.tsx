@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Select, Checkbox } from '../ui'
 
@@ -6,43 +7,53 @@ interface Props {
 	onChange: (updates: Partial<QBittorrentPreferences>) => void
 }
 
-const ENCRYPTION_OPTIONS = [
-	{ value: 0, label: 'Allow encryption' },
-	{ value: 1, label: 'Require encryption' },
-	{ value: 2, label: 'Disable encryption' },
-]
-
-const RATIO_ACTION_OPTIONS = [
-	{ value: 0, label: 'Stop torrent' },
-	{ value: 1, label: 'Remove torrent' },
-	{ value: 2, label: 'Remove torrent and files' },
-	{ value: 3, label: 'Enable super seeding' },
-]
-
 export function BitTorrentTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
+
+	const ENCRYPTION_OPTIONS = [
+		{ value: 0, label: t('settingsBitTorrent.allowEncryption') },
+		{ value: 1, label: t('settingsBitTorrent.requireEncryption') },
+		{ value: 2, label: t('settingsBitTorrent.disableEncryption') },
+	]
+
+	const RATIO_ACTION_OPTIONS = [
+		{ value: 0, label: t('settingsBitTorrent.stopTorrent') },
+		{ value: 1, label: t('settingsBitTorrent.removeTorrent') },
+		{ value: 2, label: t('settingsBitTorrent.removeTorrentAndFiles') },
+		{ value: 3, label: t('settingsBitTorrent.enableSuperSeeding') },
+	]
+
 	return (
 		<div className="space-y-4">
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Privacy
+					{t('settingsBitTorrent.privacy')}
 				</div>
 				<div className="grid grid-cols-2 gap-2">
-					<Checkbox label="Enable DHT" checked={preferences.dht ?? true} onChange={(v) => onChange({ dht: v })} />
-					<Checkbox label="Enable PeX" checked={preferences.pex ?? true} onChange={(v) => onChange({ pex: v })} />
 					<Checkbox
-						label="Enable Local Peer Discovery"
+						label={t('settingsBitTorrent.enableDht')}
+						checked={preferences.dht ?? true}
+						onChange={(v) => onChange({ dht: v })}
+					/>
+					<Checkbox
+						label={t('settingsBitTorrent.enablePex')}
+						checked={preferences.pex ?? true}
+						onChange={(v) => onChange({ pex: v })}
+					/>
+					<Checkbox
+						label={t('settingsBitTorrent.enableLpd')}
 						checked={preferences.lsd ?? true}
 						onChange={(v) => onChange({ lsd: v })}
 					/>
 					<Checkbox
-						label="Anonymous mode"
+						label={t('settingsBitTorrent.anonymousMode')}
 						checked={preferences.anonymous_mode ?? false}
 						onChange={(v) => onChange({ anonymous_mode: v })}
 					/>
 				</div>
 				<div className="flex items-center gap-3 mt-2">
 					<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-						Encryption
+						{t('settingsBitTorrent.encryption')}
 					</label>
 					<Select
 						value={preferences.encryption ?? 0}
@@ -57,7 +68,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 
 			<div className="flex items-center gap-3">
 				<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-					Max active checking torrents
+					{t('settingsBitTorrent.maxActiveChecking')}
 				</label>
 				<input
 					type="number"
@@ -78,7 +89,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ queueing_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Torrent Queueing
+						{t('settingsBitTorrent.torrentQueueing')}
 					</span>
 				</div>
 
@@ -87,7 +98,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-3 gap-3">
 							<div className="flex items-center gap-2">
 								<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Max active DL
+									{t('settingsBitTorrent.maxActiveDl')}
 								</label>
 								<input
 									type="number"
@@ -103,7 +114,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 							</div>
 							<div className="flex items-center gap-2">
 								<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Max active UL
+									{t('settingsBitTorrent.maxActiveUl')}
 								</label>
 								<input
 									type="number"
@@ -119,7 +130,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 							</div>
 							<div className="flex items-center gap-2">
 								<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Max total
+									{t('settingsBitTorrent.maxTotal')}
 								</label>
 								<input
 									type="number"
@@ -137,7 +148,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 
 						<div className="p-2 rounded space-y-2" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 							<Checkbox
-								label="Do not count slow torrents"
+								label={t('settingsBitTorrent.dontCountSlow')}
 								checked={preferences.dont_count_slow_torrents ?? false}
 								onChange={(v) => onChange({ dont_count_slow_torrents: v })}
 							/>
@@ -145,7 +156,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 								<div className="flex items-center gap-4 pl-6">
 									<div className="flex items-center gap-1">
 										<label className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											DL
+											{t('settingsBitTorrent.dl')}
 										</label>
 										<input
 											type="number"
@@ -159,12 +170,12 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 											}}
 										/>
 										<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											KiB/s
+											{t('settingsSpeed.kbs')}
 										</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<label className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											UL
+											{t('settingsBitTorrent.ul')}
 										</label>
 										<input
 											type="number"
@@ -178,12 +189,12 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 											}}
 										/>
 										<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											KiB/s
+											{t('settingsSpeed.kbs')}
 										</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<label className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											Inactive
+											{t('settingsBitTorrent.inactive')}
 										</label>
 										<input
 											type="number"
@@ -197,7 +208,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 											}}
 										/>
 										<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-											sec
+											{t('settingsBitTorrent.sec')}
 										</span>
 									</div>
 								</div>
@@ -211,12 +222,12 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Seeding Limits
+					{t('settingsBitTorrent.seedingLimits')}
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="When ratio reaches"
+							label={t('settingsBitTorrent.whenRatioReaches')}
 							checked={preferences.max_ratio_enabled ?? false}
 							onChange={(v) => onChange({ max_ratio_enabled: v })}
 						/>
@@ -236,7 +247,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="When seeding time reaches"
+							label={t('settingsBitTorrent.whenSeedingTimeReaches')}
 							checked={preferences.max_seeding_time_enabled ?? false}
 							onChange={(v) => onChange({ max_seeding_time_enabled: v })}
 						/>
@@ -253,12 +264,12 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 							}}
 						/>
 						<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-							min
+							{t('settingsBitTorrent.min')}
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="When inactive seeding time reaches"
+							label={t('settingsBitTorrent.whenInactiveSeeding')}
 							checked={preferences.max_inactive_seeding_time_enabled ?? false}
 							onChange={(v) => onChange({ max_inactive_seeding_time_enabled: v })}
 						/>
@@ -275,7 +286,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 							}}
 						/>
 						<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-							min
+							{t('settingsBitTorrent.min')}
 						</span>
 					</div>
 					{(preferences.max_ratio_enabled ||
@@ -283,7 +294,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						preferences.max_inactive_seeding_time_enabled) && (
 						<div className="flex items-center gap-2 pl-6">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								then
+								{t('settingsBitTorrent.then')}
 							</span>
 							<Select
 								value={preferences.max_ratio_act ?? 0}
@@ -306,7 +317,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ add_trackers_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Auto-append trackers
+						{t('settingsBitTorrent.autoAppendTrackers')}
 					</span>
 				</div>
 				{preferences.add_trackers_enabled && (
@@ -314,7 +325,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						value={preferences.add_trackers ?? ''}
 						onChange={(e) => onChange({ add_trackers: e.target.value })}
 						rows={3}
-						placeholder="One tracker URL per line"
+						placeholder={t('settingsBitTorrent.onePerLine')}
 						className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 						style={{
 							backgroundColor: 'var(--bg-tertiary)',
@@ -333,7 +344,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ add_trackers_from_url_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Auto-append trackers from URL
+						{t('settingsBitTorrent.autoAppendTrackersUrl')}
 					</span>
 				</div>
 				{preferences.add_trackers_from_url_enabled && (
@@ -352,7 +363,7 @@ export function BitTorrentTab({ preferences, onChange }: Props) {
 						/>
 						<div>
 							<label className="text-[10px] mb-1 block" style={{ color: 'var(--text-muted)' }}>
-								Fetched trackers (read-only)
+								{t('settingsBitTorrent.fetchedTrackers')}
 							</label>
 							<textarea
 								value={preferences.add_trackers_url_list ?? ''}

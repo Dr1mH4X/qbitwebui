@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, RefreshCw, Folder, File, Download, Check, X } from 'lucide-react'
 import {
 	listFiles,
@@ -29,6 +30,7 @@ interface FolderPickerProps {
 }
 
 function FolderPicker({ title, onConfirm, onCancel }: FolderPickerProps) {
+	const { t } = useTranslation()
 	const [pickerPath, setPickerPath] = useState('/')
 	const [folders, setFolders] = useState<FileEntry[]>([])
 	const [loading, setLoading] = useState(true)
@@ -94,11 +96,11 @@ function FolderPicker({ title, onConfirm, onCancel }: FolderPickerProps) {
 					>
 						{loading ? (
 							<div className="flex items-center justify-center h-full text-sm" style={{ color: 'var(--text-muted)' }}>
-								Loading...
+								{t('fileBrowser.loading')}
 							</div>
 						) : folders.length === 0 ? (
 							<div className="flex items-center justify-center h-full text-sm" style={{ color: 'var(--text-muted)' }}>
-								No subfolders
+								{t('fileBrowser.noSubfolders')}
 							</div>
 						) : (
 							<div className="p-2 space-y-1">
@@ -123,14 +125,15 @@ function FolderPicker({ title, onConfirm, onCancel }: FolderPickerProps) {
 						className="px-4 py-2 rounded-md text-sm font-medium"
 						style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
 					>
-						Cancel
+						{t('fileBrowser.cancel')}
 					</button>
 					<button
 						onClick={() => onConfirm(pickerPath)}
 						className="px-4 py-2 rounded-md text-sm font-medium border"
 						style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--accent)', color: 'var(--accent)' }}
 					>
-						Select "{pickerPath}"
+						{t('fileBrowser.select')}
+						{pickerPath}"
 					</button>
 				</div>
 			</div>
@@ -143,6 +146,7 @@ interface Props {
 }
 
 export function FileBrowser({ enabled }: Props) {
+	const { t } = useTranslation()
 	const [path, setPath] = useState('/')
 	const [files, setFiles] = useState<FileEntry[]>([])
 	const [loading, setLoading] = useState(true)
@@ -167,7 +171,7 @@ export function FileBrowser({ enabled }: Props) {
 			const data = await listFiles(path)
 			setFiles(data)
 		} catch (e) {
-			setError(e instanceof Error ? e.message : 'Failed to load files')
+			setError(e instanceof Error ? e.message : t('fileBrowser.failedToLoad'))
 			setFiles([])
 		} finally {
 			setLoading(false)
@@ -188,10 +192,10 @@ export function FileBrowser({ enabled }: Props) {
 			>
 				<Folder className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
 				<p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
-					File Browser is not configured
+					{t('fileBrowser.notConfigured')}
 				</p>
 				<p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
-					Set DOWNLOADS_PATH environment variable to enable
+					{t('fileBrowser.setEnvVar')}
 				</p>
 				<a
 					href="https://maciejonos.github.io/qbitwebui/guide/configuration"
@@ -200,7 +204,7 @@ export function FileBrowser({ enabled }: Props) {
 					className="text-xs underline"
 					style={{ color: 'var(--accent)' }}
 				>
-					How to configure
+					{t('fileBrowser.howToConfigure')}
 				</a>
 			</div>
 		)
@@ -246,7 +250,7 @@ export function FileBrowser({ enabled }: Props) {
 			setDeleteConfirm(false)
 			await loadFiles()
 		} catch (e) {
-			setError(e instanceof Error ? e.message : 'Delete failed')
+			setError(e instanceof Error ? e.message : t('fileBrowser.deleteFailed'))
 		} finally {
 			setActionLoading(false)
 		}
@@ -264,7 +268,7 @@ export function FileBrowser({ enabled }: Props) {
 			setFolderPickerMode(null)
 			await loadFiles()
 		} catch (e) {
-			setError(e instanceof Error ? e.message : `${mode} failed`)
+			setError(e instanceof Error ? e.message : t('fileBrowser.moveCopyFailed'))
 		} finally {
 			setActionLoading(false)
 		}
@@ -280,7 +284,7 @@ export function FileBrowser({ enabled }: Props) {
 			setRenameValue('')
 			await loadFiles()
 		} catch (e) {
-			setError(e instanceof Error ? e.message : 'Rename failed')
+			setError(e instanceof Error ? e.message : t('fileBrowser.renameFailed'))
 		} finally {
 			setActionLoading(false)
 		}
@@ -333,7 +337,7 @@ export function FileBrowser({ enabled }: Props) {
 					onClick={loadFiles}
 					className="ml-auto p-1.5 rounded-md transition-colors"
 					style={{ backgroundColor: 'var(--bg-tertiary)' }}
-					title="Refresh"
+					title={t('fileBrowser.refresh')}
 				>
 					<RefreshCw
 						className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
@@ -349,7 +353,8 @@ export function FileBrowser({ enabled }: Props) {
 					style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 				>
 					<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-						{selected.size} selected
+						{selected.size}
+						{t('fileBrowser.selected')}
 					</span>
 					<div className="ml-auto flex items-center gap-2">
 						{selected.size === 1 && (
@@ -363,7 +368,7 @@ export function FileBrowser({ enabled }: Props) {
 									color: 'var(--text-primary)',
 								}}
 							>
-								Rename
+								{t('fileBrowser.rename')}
 							</button>
 						)}
 						<button
@@ -376,7 +381,7 @@ export function FileBrowser({ enabled }: Props) {
 								color: 'var(--text-primary)',
 							}}
 						>
-							Move
+							{t('fileBrowser.move')}
 						</button>
 						<button
 							onClick={() => setFolderPickerMode('copy')}
@@ -388,7 +393,7 @@ export function FileBrowser({ enabled }: Props) {
 								color: 'var(--text-primary)',
 							}}
 						>
-							Copy
+							{t('fileBrowser.copy')}
 						</button>
 						<button
 							onClick={() => setDeleteConfirm(true)}
@@ -396,7 +401,7 @@ export function FileBrowser({ enabled }: Props) {
 							className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
 							style={{ backgroundColor: 'color-mix(in srgb, var(--error) 15%, transparent)', color: 'var(--error)' }}
 						>
-							Delete
+							{t('fileBrowser.delete')}
 						</button>
 					</div>
 				</div>
@@ -440,19 +445,19 @@ export function FileBrowser({ enabled }: Props) {
 								className="text-left px-4 py-3 text-[10px] font-medium uppercase tracking-wider"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Name
+								{t('columns.name')}
 							</th>
 							<th
 								className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-wider w-28"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Size
+								{t('columns.size')}
 							</th>
 							<th
 								className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-wider w-44"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Modified
+								{t('columns.last_activity')}
 							</th>
 							<th className="w-16"></th>
 						</tr>
@@ -465,7 +470,7 @@ export function FileBrowser({ enabled }: Props) {
 									className="px-4 py-8 text-center text-sm"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Loading...
+									{t('fileBrowser.loading')}
 								</td>
 							</tr>
 						) : files.length === 0 ? (
@@ -475,7 +480,7 @@ export function FileBrowser({ enabled }: Props) {
 									className="px-4 py-8 text-center text-sm"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Empty directory
+									{t('fileBrowser.emptyDirectory')}
 								</td>
 							</tr>
 						) : (
@@ -527,7 +532,7 @@ export function FileBrowser({ enabled }: Props) {
 											href={getDownloadUrl(path === '/' ? `/${file.name}` : `${path}/${file.name}`)}
 											className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors"
 											style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
-											title={file.isDirectory ? 'Download as .tar' : 'Download'}
+											title={file.isDirectory ? t('fileBrowser.downloadTar') : t('fileBrowser.download')}
 										>
 											<Download className="w-3.5 h-3.5" strokeWidth={2} />
 										</a>
@@ -541,7 +546,7 @@ export function FileBrowser({ enabled }: Props) {
 
 			{folderPickerMode && (
 				<FolderPicker
-					title={folderPickerMode === 'move' ? 'Move to...' : 'Copy to...'}
+					title={folderPickerMode === 'move' ? t('fileBrowser.moveTo') : t('fileBrowser.copyTo')}
 					onConfirm={handleMoveOrCopy}
 					onCancel={() => setFolderPickerMode(null)}
 				/>
@@ -559,7 +564,7 @@ export function FileBrowser({ enabled }: Props) {
 					>
 						<div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
 							<h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>
-								Rename
+								{t('fileBrowser.rename')}
 							</h3>
 						</div>
 						<div className="p-4">
@@ -583,7 +588,7 @@ export function FileBrowser({ enabled }: Props) {
 								className="px-4 py-2 rounded-md text-sm font-medium"
 								style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('fileBrowser.cancel')}
 							</button>
 							<button
 								onClick={handleRename}
@@ -591,7 +596,7 @@ export function FileBrowser({ enabled }: Props) {
 								className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--accent)', color: 'white' }}
 							>
-								Rename
+								{t('fileBrowser.rename')}
 							</button>
 						</div>
 					</div>
@@ -610,12 +615,12 @@ export function FileBrowser({ enabled }: Props) {
 					>
 						<div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
 							<h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>
-								Confirm Delete
+								{t('fileBrowser.confirmDelete')}
 							</h3>
 						</div>
 						<div className="p-4">
 							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-								Delete {selected.size} item{selected.size > 1 ? 's' : ''}? This cannot be undone.
+								{t('common.confirmDeleteItems', { count: selected.size })}
 							</p>
 							{selected.size <= 5 && (
 								<ul className="mt-3 text-sm space-y-1" style={{ color: 'var(--text-muted)' }}>
@@ -633,7 +638,7 @@ export function FileBrowser({ enabled }: Props) {
 								className="px-4 py-2 rounded-md text-sm font-medium"
 								style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('fileBrowser.cancel')}
 							</button>
 							<button
 								onClick={handleDelete}
@@ -641,7 +646,7 @@ export function FileBrowser({ enabled }: Props) {
 								className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--error)', color: 'var(--accent-contrast)' }}
 							>
-								Delete
+								{t('fileBrowser.delete')}
 							</button>
 						</div>
 					</div>

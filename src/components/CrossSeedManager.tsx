@@ -1,4 +1,5 @@
 import { type Instance } from '../api/instances'
+import { useTranslation } from 'react-i18next'
 import { formatSize, formatCountdown } from '../utils/format'
 import { Toggle, Select, MultiSelect } from './ui'
 import { useCrossSeed, formatTimestamp, LOG_LEVEL_COLORS } from '../hooks/useCrossSeed'
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function CrossSeedManager({ instances }: Props) {
+	const { t } = useTranslation()
 	const {
 		selectedInstance,
 		setSelectedInstance,
@@ -40,7 +42,7 @@ export function CrossSeedManager({ instances }: Props) {
 				style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 			>
 				<p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-					No instances configured
+					{t('crossSeed.noInstances')}
 				</p>
 			</div>
 		)
@@ -57,7 +59,7 @@ export function CrossSeedManager({ instances }: Props) {
 					style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent)' }}
 				/>
 				<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-					Loading...
+					{t('crossSeed.loading')}
 				</span>
 			</div>
 		)
@@ -74,7 +76,7 @@ export function CrossSeedManager({ instances }: Props) {
 				className="absolute top-0 right-0 px-3 py-2 rounded-lg border text-xs"
 				style={{ borderColor: 'var(--error)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
 			>
-				<span style={{ color: 'var(--error)' }}>Experimental</span> · Report issues
+				<span style={{ color: 'var(--error)' }}>{t('crossSeed.experimental')}</span> · {t('crossSeed.reportIssues')}
 			</a>
 			<div
 				className="shrink-0 flex items-center justify-between pb-4 border-b mb-4"
@@ -115,7 +117,7 @@ export function CrossSeedManager({ instances }: Props) {
 								color: 'var(--warning)',
 							}}
 						>
-							No Prowlarr
+							{t('crossSeed.noProwlarr')}
 						</span>
 					)}
 				</div>
@@ -127,15 +129,15 @@ export function CrossSeedManager({ instances }: Props) {
 			>
 				<div>
 					<div className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-						Scheduler
+						{t('crossSeed.scheduler')}
 					</div>
 					<div className="text-sm font-medium" style={{ color: status?.enabled ? '#a6e3a1' : 'var(--text-muted)' }}>
-						{status?.enabled ? 'On' : 'Off'}
+						{status?.enabled ? t('common.on') : t('common.off')}
 					</div>
 				</div>
 				<div>
 					<div className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-						Status
+						{t('crossSeed.status')}
 					</div>
 					<div
 						className="text-sm font-medium flex items-center gap-2"
@@ -147,12 +149,12 @@ export function CrossSeedManager({ instances }: Props) {
 								style={{ backgroundColor: stopping ? 'var(--warning)' : 'var(--accent)' }}
 							/>
 						)}
-						{stopping ? 'Stopping' : isRunning ? 'Running' : 'Idle'}
+						{stopping ? t('crossSeed.stopping') : isRunning ? t('crossSeed.running') : t('crossSeed.idle')}
 					</div>
 				</div>
 				<div>
 					<div className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-						Last Run
+						{t('crossSeed.lastRun')}
 					</div>
 					<div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
 						{formatTimestamp(status?.lastRun ?? null)}
@@ -160,7 +162,7 @@ export function CrossSeedManager({ instances }: Props) {
 				</div>
 				<div>
 					<div className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-						Next
+						{t('crossSeed.next')}
 					</div>
 					<div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
 						{status?.enabled ? formatCountdown(status?.nextRun ?? null) : '—'}
@@ -168,7 +170,7 @@ export function CrossSeedManager({ instances }: Props) {
 				</div>
 				<div>
 					<div className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-						Cache
+						{t('crossSeed.cache')}
 					</div>
 					<div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
 						{cacheStats ? `${cacheStats.cache.count} (${formatSize(cacheStats.cache.totalSize)})` : '0'}
@@ -183,24 +185,24 @@ export function CrossSeedManager({ instances }: Props) {
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<div className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: 'var(--text-muted)' }}>
-							Configuration
+							{t('crossSeed.configuration')}
 						</div>
 						<div className="space-y-4">
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Enabled
+									{t('common.enabled')}
 								</span>
 								<Toggle checked={config.enabled} onChange={(v) => setConfig({ ...config, enabled: v })} />
 							</div>
 							<div>
 								<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-									Prowlarr
+									{t('crossSeed.prowlarr')}
 								</label>
 								<Select
 									value={config.integration_id ? String(config.integration_id) : ''}
 									onChange={(v) => setConfig({ ...config, integration_id: v ? Number(v) : null, indexer_ids: [] })}
 									options={[
-										{ value: '', label: 'None' },
+										{ value: '', label: t('common.none') },
 										...prowlarrIntegrations.map((i) => ({ value: String(i.id), label: i.label })),
 									]}
 									minWidth="100%"
@@ -209,7 +211,7 @@ export function CrossSeedManager({ instances }: Props) {
 							<div className="grid grid-cols-2 gap-3">
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Interval (hours)
+										{t('crossSeed.interval')}
 									</label>
 									<input
 										type="number"
@@ -227,7 +229,7 @@ export function CrossSeedManager({ instances }: Props) {
 								</div>
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Delay (30-3600s)
+										{t('crossSeed.delay')}
 									</label>
 									<input
 										type="number"
@@ -249,20 +251,21 @@ export function CrossSeedManager({ instances }: Props) {
 							{availableIndexers.length > 0 && (
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Indexers ({config.indexer_ids.length}/{availableIndexers.length})
+										{t('crossSeed.indexers')}
+										{config.indexer_ids.length}/{availableIndexers.length})
 									</label>
 									<MultiSelect
 										options={availableIndexers.map((idx) => ({ value: idx.id, label: idx.name }))}
 										selected={config.indexer_ids}
 										onChange={(ids) => setConfig({ ...config, indexer_ids: ids })}
-										placeholder="Select indexers..."
+										placeholder={t('crossSeed.selectIndexers')}
 									/>
 								</div>
 							)}
 							<div className="grid grid-cols-2 gap-3">
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Category Suffix
+										{t('crossSeed.categorySuffix')}
 									</label>
 									<input
 										type="text"
@@ -278,7 +281,7 @@ export function CrossSeedManager({ instances }: Props) {
 								</div>
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Tag
+										{t('crossSeed.tag')}
 									</label>
 									<input
 										type="text"
@@ -295,14 +298,14 @@ export function CrossSeedManager({ instances }: Props) {
 							</div>
 							<div>
 								<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-									Match Mode
+									{t('crossSeed.matchMode')}
 								</label>
 								<Select
 									value={config.match_mode}
 									onChange={(v) => setConfig({ ...config, match_mode: v as 'strict' | 'flexible' })}
 									options={[
-										{ value: 'strict', label: 'Strict (names must match)' },
-										{ value: 'flexible', label: 'Flexible (sizes only, requires link_dir)' },
+										{ value: 'strict', label: t('crossSeed.strict') },
+										{ value: 'flexible', label: t('crossSeed.flexible') },
 									]}
 									minWidth="100%"
 								/>
@@ -310,7 +313,7 @@ export function CrossSeedManager({ instances }: Props) {
 							{config.match_mode === 'flexible' && (
 								<div>
 									<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-										Link Directory (for flexible mode)
+										{t('crossSeed.linkDirectory')}
 									</label>
 									<input
 										type="text"
@@ -325,13 +328,13 @@ export function CrossSeedManager({ instances }: Props) {
 										}}
 									/>
 									<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-										Hardlinks will be created here when file names differ
+										{t('crossSeed.hardlinksHint')}
 									</p>
 								</div>
 							)}
 							<div>
 								<label className="block text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-									Blocklist (one per line)
+									{t('crossSeed.blocklist')}
 								</label>
 								<textarea
 									value={config.blocklist.join('\n')}
@@ -355,13 +358,12 @@ export function CrossSeedManager({ instances }: Props) {
 									}}
 								/>
 								<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-									Format: type:value (name, nameRegex, folder, folderRegex, category, tag, tracker, infoHash, sizeBelow,
-									sizeAbove)
+									{t('crossSeed.blocklistFormat')}
 								</p>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Include Single Episodes
+									{t('crossSeed.includeEpisodes')}
 								</span>
 								<Toggle
 									checked={config.include_single_episodes}
@@ -370,13 +372,13 @@ export function CrossSeedManager({ instances }: Props) {
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Dry Run
+									{t('crossSeed.dryRun')}
 								</span>
 								<Toggle checked={config.dry_run} onChange={(v) => setConfig({ ...config, dry_run: v })} />
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Skip Recheck
+									{t('crossSeed.skipRecheck')}
 								</span>
 								<Toggle checked={config.skip_recheck} onChange={(v) => setConfig({ ...config, skip_recheck: v })} />
 							</div>
@@ -387,7 +389,7 @@ export function CrossSeedManager({ instances }: Props) {
 									className="px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
 									style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 								>
-									{saving ? 'Saving...' : 'Save Configuration'}
+									{saving ? t('crossSeed.saving') : t('crossSeed.saveConfig')}
 								</button>
 							</div>
 						</div>
@@ -398,7 +400,7 @@ export function CrossSeedManager({ instances }: Props) {
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<div className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: 'var(--text-muted)' }}>
-							Actions
+							{t('common.actions')}
 						</div>
 						<div className="grid grid-cols-2 gap-3">
 							<button
@@ -407,7 +409,7 @@ export function CrossSeedManager({ instances }: Props) {
 								className="px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 							>
-								Scan
+								{t('crossSeed.scan')}
 							</button>
 							<button
 								onClick={() => handleScan(true)}
@@ -415,9 +417,9 @@ export function CrossSeedManager({ instances }: Props) {
 								className="px-3 py-2 rounded-lg text-sm border disabled:opacity-50 flex items-center justify-center gap-1.5"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Force Scan
+								{t('crossSeed.forceScan')}
 								<span
-									title="Re-scans all torrents, including those already searched. Use when indexers have new content or after changing settings."
+									title={t('crossSeed.forceScanHint')}
 									className="inline-flex items-center justify-center w-4 h-4 rounded-full text-xs cursor-help"
 									style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}
 								>
@@ -433,16 +435,16 @@ export function CrossSeedManager({ instances }: Props) {
 									color: isRunning ? 'var(--error)' : 'var(--text-muted)',
 								}}
 							>
-								{stopping ? 'Stopping...' : 'Stop'}
+								{stopping ? t('crossSeed.stopping') : t('crossSeed.stop')}
 							</button>
 							<button
 								onClick={handleClearCache}
 								className="px-3 py-2 rounded-lg text-sm border flex items-center justify-center gap-1.5"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Clear Torrents
+								{t('crossSeed.clearTorrents')}
 								<span
-									title="Removes cached .torrent files."
+									title={t('crossSeed.clearTorrentsHint')}
 									className="inline-flex items-center justify-center w-4 h-4 rounded-full text-xs cursor-help"
 									style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}
 								>
@@ -459,15 +461,16 @@ export function CrossSeedManager({ instances }: Props) {
 				>
 					<div className="shrink-0 flex items-center justify-between mb-4">
 						<div className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Logs
+							{t('crossSeed.logs')}
 						</div>
 						<div className="flex items-center gap-4">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								{logs.length} entries
+								{logs.length}
+								{t('crossSeed.entries')}
 							</span>
 							<label className="flex items-center gap-2 cursor-pointer">
 								<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Auto-scroll
+									{t('crossSeed.autoScroll')}
 								</span>
 								<Toggle checked={autoScroll} onChange={setAutoScroll} />
 							</label>
@@ -480,7 +483,7 @@ export function CrossSeedManager({ instances }: Props) {
 					>
 						{logs.length === 0 ? (
 							<div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
-								No logs
+								{t('crossSeed.noLogs')}
 							</div>
 						) : (
 							logs.map((log, i) => {

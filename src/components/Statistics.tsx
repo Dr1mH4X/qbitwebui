@@ -1,13 +1,15 @@
 import { ArrowDown, ArrowUp, AlertCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatSize } from '../utils/format'
 import { Select } from './ui'
 import { useStats } from '../hooks/useStats'
 
 export function Statistics() {
+	const { t } = useTranslation()
 	const { periodData, instances, selectedInstance, setSelectedInstance, isLoading, hasAnyData } = useStats()
 
 	const instanceOptions = [
-		{ value: 'all', label: 'All instances' },
+		{ value: 'all', label: t('statistics.allInstances') },
 		...instances.map((i) => ({ value: String(i.id), label: i.label })),
 	]
 
@@ -15,7 +17,7 @@ export function Statistics() {
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-					Transfer Statistics
+					{t('statistics.title')}
 				</h1>
 				{instances.length > 1 && (
 					<div className="w-48">
@@ -26,7 +28,7 @@ export function Statistics() {
 
 			{isLoading ? (
 				<div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-					Loading statistics...
+					{t('statistics.loading')}
 				</div>
 			) : (
 				<>
@@ -40,10 +42,8 @@ export function Statistics() {
 						>
 							<AlertCircle className="w-5 h-5 flex-shrink-0" />
 							<div>
-								<div className="font-medium">No data available yet</div>
-								<div className="text-xs opacity-80 mt-0.5">
-									Statistics are recorded every 5 minutes. Data will appear once enough time has passed.
-								</div>
+								<div className="font-medium">{t('statistics.noData')}</div>
+								<div className="text-xs opacity-80 mt-0.5">{t('statistics.noDataDesc')}</div>
 							</div>
 						</div>
 					)}
@@ -85,10 +85,10 @@ export function Statistics() {
 					</div>
 
 					<ul className="text-xs space-y-1 list-disc list-inside" style={{ color: 'var(--text-muted)' }}>
-						<li>Statistics are recorded every 5 minutes while the server is running</li>
-						<li>All time values are fetched directly from qBittorrent</li>
-						<li>Other periods show the difference between current and historical snapshots</li>
-						<li>Download stats include protocol traffic (DHT, PEX, tracker responses), not just file data</li>
+						<li>{t('statistics.recordedEvery5Min')}</li>
+						<li>{t('statistics.allTimeValues')}</li>
+						<li>{t('statistics.otherPeriods')}</li>
+						<li>{t('statistics.downloadStats')}</li>
 					</ul>
 				</>
 			)}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Toggle, Select } from '../ui'
@@ -7,12 +8,14 @@ interface Props {
 	onChange: (updates: Partial<QBittorrentPreferences>) => void
 }
 
-const DYNDNS_SERVICES = [
-	{ value: 0, label: 'DynDNS' },
-	{ value: 1, label: 'NO-IP' },
-]
-
 export function WebUITab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
+
+	const DYNDNS_SERVICES = [
+		{ value: 0, label: t('settingsWebui.dynDns') },
+		{ value: 1, label: t('settingsWebui.noIp') },
+	]
+
 	return (
 		<div className="space-y-4">
 			<div
@@ -24,24 +27,24 @@ export function WebUITab({ preferences, onChange }: Props) {
 			>
 				<AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--warning)' }} strokeWidth={1.5} />
 				<p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-					Changing port, address, or auth settings may lock you out.
+					{t('settingsWebui.warning')}
 				</p>
 			</div>
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Web User Interface
+					{t('settingsWebui.webUserInterface')}
 				</div>
 				<div className="grid grid-cols-3 gap-2 mb-2">
 					<div className="col-span-2">
 						<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-							IP address
+							{t('settingsWebui.ipAddress')}
 						</label>
 						<input
 							type="text"
 							value={preferences.web_ui_address ?? '*'}
 							onChange={(e) => onChange({ web_ui_address: e.target.value })}
-							placeholder="* = all"
+							placeholder={t('settingsWebui.allInterfaces')}
 							className="w-full px-2 py-1.5 rounded border text-xs"
 							style={{
 								backgroundColor: 'var(--bg-tertiary)',
@@ -52,7 +55,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					</div>
 					<div>
 						<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-							Port
+							{t('common.port')}
 						</label>
 						<input
 							type="number"
@@ -69,7 +72,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 				</div>
 				<div className="flex items-center justify-between">
 					<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-						Use UPnP / NAT-PMP for WebUI port
+						{t('settingsWebui.useUpnp')}
 					</span>
 					<Toggle checked={preferences.web_ui_upnp ?? false} onChange={(v) => onChange({ web_ui_upnp: v })} />
 				</div>
@@ -80,7 +83,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 			<div>
 				<div className="flex items-center justify-between mb-2">
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						HTTPS
+						{t('settingsWebui.https')}
 					</span>
 					<Toggle checked={preferences.use_https ?? false} onChange={(v) => onChange({ use_https: v })} />
 				</div>
@@ -88,7 +91,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					<div className="space-y-2 pl-4">
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Certificate path
+								{t('settingsWebui.certificatePath')}
 							</label>
 							<input
 								type="text"
@@ -104,7 +107,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Private key path
+								{t('settingsWebui.privateKeyPath')}
 							</label>
 							<input
 								type="text"
@@ -126,12 +129,12 @@ export function WebUITab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Authentication
+					{t('settingsWebui.authentication')}
 				</div>
 				<div className="space-y-2">
 					<div>
 						<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-							Username
+							{t('common.username')}
 						</label>
 						<input
 							type="text"
@@ -147,7 +150,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Bypass auth for localhost
+							{t('settingsWebui.bypassLocalhost')}
 						</span>
 						<Toggle
 							checked={preferences.bypass_local_auth ?? false}
@@ -156,7 +159,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Bypass for whitelisted subnets
+							{t('settingsWebui.bypassWhitelist')}
 						</span>
 						<Toggle
 							checked={preferences.bypass_auth_subnet_whitelist_enabled ?? false}
@@ -167,7 +170,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						<textarea
 							value={preferences.bypass_auth_subnet_whitelist ?? ''}
 							onChange={(e) => onChange({ bypass_auth_subnet_whitelist: e.target.value })}
-							placeholder="One subnet per line (e.g., 192.168.1.0/24)"
+							placeholder={t('settingsWebui.oneSubnetPerLine')}
 							rows={2}
 							className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 							style={{
@@ -180,7 +183,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					<div className="grid grid-cols-3 gap-2">
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Max auth fails
+								{t('settingsWebui.maxAuthFails')}
 							</label>
 							<input
 								type="number"
@@ -196,7 +199,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Ban duration (s)
+								{t('settingsWebui.banDuration')}
 							</label>
 							<input
 								type="number"
@@ -212,7 +215,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Session timeout (s)
+								{t('settingsWebui.sessionTimeout')}
 							</label>
 							<input
 								type="number"
@@ -234,13 +237,13 @@ export function WebUITab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Security
+					{t('settingsWebui.security')}
 				</div>
 				<div className="space-y-2">
 					<div className="grid grid-cols-2 gap-x-4 gap-y-1">
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Clickjacking protection
+								{t('settingsWebui.clickjackingProtection')}
 							</span>
 							<Toggle
 								checked={preferences.web_ui_clickjacking_protection_enabled ?? true}
@@ -249,7 +252,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								CSRF protection
+								{t('settingsWebui.csrfProtection')}
 							</span>
 							<Toggle
 								checked={preferences.web_ui_csrf_protection_enabled ?? true}
@@ -258,7 +261,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Secure cookie
+								{t('settingsWebui.secureCookie')}
 							</span>
 							<Toggle
 								checked={preferences.web_ui_secure_cookie_enabled ?? true}
@@ -267,7 +270,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Host header validation
+								{t('settingsWebui.hostHeaderValidation')}
 							</span>
 							<Toggle
 								checked={preferences.web_ui_host_header_validation_enabled ?? true}
@@ -278,12 +281,12 @@ export function WebUITab({ preferences, onChange }: Props) {
 					{preferences.web_ui_host_header_validation_enabled && (
 						<div className="pl-4">
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Server domains
+								{t('settingsWebui.serverDomains')}
 							</label>
 							<textarea
 								value={preferences.web_ui_domain_list ?? ''}
 								onChange={(e) => onChange({ web_ui_domain_list: e.target.value })}
-								placeholder="One domain per line"
+								placeholder={t('settingsWebui.oneDomainPerLine')}
 								rows={2}
 								className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 								style={{
@@ -296,7 +299,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					)}
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Add custom HTTP headers
+							{t('settingsWebui.customHttpHeaders')}
 						</span>
 						<Toggle
 							checked={preferences.web_ui_use_custom_http_headers_enabled ?? false}
@@ -307,7 +310,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						<textarea
 							value={preferences.web_ui_custom_http_headers ?? ''}
 							onChange={(e) => onChange({ web_ui_custom_http_headers: e.target.value })}
-							placeholder="Header: value (one per line)"
+							placeholder={t('settingsWebui.headerValue')}
 							rows={2}
 							className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 							style={{
@@ -319,7 +322,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 					)}
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Enable reverse proxy support
+							{t('settingsWebui.reverseProxy')}
 						</span>
 						<Toggle
 							checked={preferences.web_ui_reverse_proxy_enabled ?? false}
@@ -330,7 +333,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						<textarea
 							value={preferences.web_ui_reverse_proxies_list ?? ''}
 							onChange={(e) => onChange({ web_ui_reverse_proxies_list: e.target.value })}
-							placeholder="Trusted proxies (one per line)"
+							placeholder={t('settingsWebui.trustedProxies')}
 							rows={2}
 							className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 							style={{
@@ -348,7 +351,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 			<div>
 				<div className="flex items-center justify-between mb-2">
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Alternative WebUI
+						{t('settingsWebui.alternativeWebui')}
 					</span>
 					<Toggle
 						checked={preferences.alternative_webui_enabled ?? false}
@@ -360,7 +363,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						type="text"
 						value={preferences.alternative_webui_path ?? ''}
 						onChange={(e) => onChange({ alternative_webui_path: e.target.value })}
-						placeholder="Files location"
+						placeholder={t('settingsWebui.filesLocation')}
 						className="w-full px-2 py-1.5 rounded border text-xs"
 						style={{
 							backgroundColor: 'var(--bg-tertiary)',
@@ -376,7 +379,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 			<div>
 				<div className="flex items-center justify-between mb-2">
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Dynamic DNS
+						{t('settingsWebui.dynamicDns')}
 					</span>
 					<Toggle checked={preferences.dyndns_enabled ?? false} onChange={(v) => onChange({ dyndns_enabled: v })} />
 				</div>
@@ -385,7 +388,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-2 gap-2">
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Service
+									{t('settingsWebui.service')}
 								</label>
 								<Select
 									value={preferences.dyndns_service ?? 0}
@@ -395,7 +398,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 							</div>
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Domain
+									{t('settingsWebui.domain')}
 								</label>
 								<input
 									type="text"
@@ -413,7 +416,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-2 gap-2">
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Username
+									{t('common.username')}
 								</label>
 								<input
 									type="text"
@@ -429,7 +432,7 @@ export function WebUITab({ preferences, onChange }: Props) {
 							</div>
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Password
+									{t('common.password')}
 								</label>
 								<input
 									type="password"

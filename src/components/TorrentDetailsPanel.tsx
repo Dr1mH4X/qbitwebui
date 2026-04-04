@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	Settings,
 	ArrowRightLeft,
@@ -40,28 +41,39 @@ interface Props {
 
 type Tab = 'general' | 'trackers' | 'peers' | 'http' | 'content'
 
-const TABS: { id: Tab; label: string; Icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }[] = [
-	{ id: 'general', label: 'General', Icon: Settings },
-	{ id: 'trackers', label: 'Trackers', Icon: ArrowRightLeft },
-	{ id: 'peers', label: 'Peers', Icon: Users },
-	{ id: 'http', label: 'HTTP', Icon: Link },
-	{ id: 'content', label: 'Files', Icon: Folder },
+const TABS: { id: Tab; labelKey: string; Icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }[] = [
+	{ id: 'general', labelKey: 'torrentDetails.general', Icon: Settings },
+	{ id: 'trackers', labelKey: 'torrentDetails.trackers', Icon: ArrowRightLeft },
+	{ id: 'peers', labelKey: 'torrentDetails.peers', Icon: Users },
+	{ id: 'http', labelKey: 'torrentDetails.httpSources', Icon: Link },
+	{ id: 'content', labelKey: 'torrentDetails.files', Icon: Folder },
 ]
 
 const MIN_HEIGHT = 120
 const MAX_HEIGHT_PERCENT = 0.55
 const COLLAPSED_HEIGHT = 36
 
-const TRACKER_STATUSES: Record<number, { label: string; colorVar: string }> = {
-	0: { label: 'Disabled', colorVar: 'var(--text-muted)' },
-	1: { label: 'Not contacted', colorVar: 'var(--text-muted)' },
-	2: { label: 'Working', colorVar: 'var(--accent)' },
-	3: { label: 'Updating', colorVar: 'var(--warning)' },
-	4: { label: 'Error', colorVar: 'var(--error)' },
+const TRACKER_STATUS_KEYS: Record<number, string> = {
+	0: 'common.disabled',
+	1: 'torrentDetails.notContacted',
+	2: 'torrentDetails.working',
+	3: 'torrentDetails.updating',
+	4: 'torrentRow.error',
+}
+
+const TRACKER_STATUS_COLORS: Record<number, string> = {
+	0: 'var(--text-muted)',
+	1: 'var(--text-muted)',
+	2: 'var(--accent)',
+	3: 'var(--warning)',
+	4: 'var(--error)',
 }
 
 function StatusBadge({ status }: { status: number }) {
-	const { label, colorVar } = TRACKER_STATUSES[status] ?? { label: 'Unknown', colorVar: 'var(--text-muted)' }
+	const { t } = useTranslation()
+	const labelKey = TRACKER_STATUS_KEYS[status] ?? 'common.unknown'
+	const colorVar = TRACKER_STATUS_COLORS[status] ?? 'var(--text-muted)'
+	const label = t(labelKey)
 	return (
 		<span
 			className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium"
@@ -100,8 +112,8 @@ function EmptyState({ message }: { message: string }) {
 	)
 }
 
-function formatLimit(limit: number): string {
-	return limit <= 0 ? '∞' : formatSpeed(limit)
+function formatLimit(limit: number, t: (k: string) => string): string {
+	return limit <= 0 ? t('format.infinity') : formatSpeed(limit)
 }
 
 const cellBase = { backgroundColor: 'color-mix(in srgb, white 2.5%, transparent)', borderColor: 'var(--border)' }
@@ -142,12 +154,15 @@ function InfoCell({
 }
 
 function GeneralTab({ hash, category, tags }: { hash: string; category: string; tags: string }) {
+	const { t } = useTranslation()
 	const { data: p, isLoading } = useTorrentProperties(hash)
 	if (isLoading) return <LoadingSkeleton />
-	if (!p) return <EmptyState message="Failed to load" />
+	if (!p) return <EmptyState message={t('torrentDetails.failedToLoad')} />
 
 	const ratio =
-		p.total_downloaded === 0 && p.pieces_have === p.pieces_num && p.total_size > 0 ? '∞' : p.share_ratio.toFixed(2)
+		p.total_downloaded === 0 && p.pieces_have === p.pieces_num && p.total_size > 0
+			? t('format.infinity')
+			: p.share_ratio.toFixed(2)
 
 	const timeActive =
 		p.seeding_time > 0
@@ -161,41 +176,57 @@ function GeneralTab({ hash, category, tags }: { hash: string; category: string; 
 					className="px-2 text-[9px] uppercase tracking-widest font-medium"
 					style={{ color: 'var(--text-muted)' }}
 				>
-					Transfer
+					{t('torrentDetails.transfer')}
 				</legend>
 				<div className="grid grid-cols-12 gap-1.5">
-					<InfoCell label="Time Active" value={timeActive} span={2} />
-					<InfoCell label="ETA" value={formatEta(p.eta)} span={2} />
-					<InfoCell label="Connections" value={`${p.nb_connections} (${p.nb_connections_limit} max)`} span={2} />
-					<InfoCell label="Seeds" value={`${p.seeds} (${p.seeds_total} total)`} span={2} />
-					<InfoCell label="Peers" value={`${p.peers} (${p.peers_total} total)`} span={2} />
-					<InfoCell label="Wasted" value={formatSize(p.total_wasted)} span={2} />
+					<InfoCell label={t('torrentDetails.timeActive')} value={timeActive} span={2} />
+					<InfoCell label={t('torrentDetails.eta')} value={formatEta(p.eta)} span={2} />
 					<InfoCell
-						label="Downloaded"
+						label={t('torrentDetails.connections')}
+						value={`${p.nb_connections} (${p.nb_connections_limit} max)`}
+						span={2}
+					/>
+					<InfoCell label={t('torrentDetails.seeds')} value={`${p.seeds} (${p.seeds_total} total)`} span={2} />
+					<InfoCell label={t('torrentDetails.peers')} value={`${p.peers} (${p.peers_total} total)`} span={2} />
+					<InfoCell label={t('torrentDetails.wasted')} value={formatSize(p.total_wasted)} span={2} />
+					<InfoCell
+						label={t('torrentDetails.downloaded')}
 						value={`${formatSize(p.total_downloaded)} (${formatSize(p.total_downloaded_session)} session)`}
 						span={2}
 					/>
 					<InfoCell
-						label="Uploaded"
+						label={t('torrentDetails.uploaded')}
 						value={`${formatSize(p.total_uploaded)} (${formatSize(p.total_uploaded_session)} session)`}
 						span={2}
 					/>
 					<InfoCell
-						label="DL Speed"
+						label={t('torrentDetails.dlSpeed')}
 						value={`${formatSpeed(p.dl_speed)} (${formatSpeed(p.dl_speed_avg)} avg)`}
 						span={2}
 					/>
 					<InfoCell
-						label="UP Speed"
+						label={t('torrentDetails.upSpeed')}
 						value={`${formatSpeed(p.up_speed)} (${formatSpeed(p.up_speed_avg)} avg)`}
 						span={2}
 					/>
-					<InfoCell label="DL Limit" value={formatLimit(p.dl_limit)} span={2} />
-					<InfoCell label="UP Limit" value={formatLimit(p.up_limit)} span={2} />
-					<InfoCell label="Ratio" value={ratio} span={3} />
-					<InfoCell label="Reannounce" value={p.reannounce > 0 ? formatDuration(p.reannounce) : '0'} span={3} />
-					<InfoCell label="Last Seen Complete" value={p.last_seen > 0 ? formatDate(p.last_seen) : 'Never'} span={3} />
-					<InfoCell label="Popularity" value={p.popularity !== undefined ? p.popularity.toFixed(2) : '—'} span={3} />
+					<InfoCell label={t('torrentDetails.dlLimit')} value={formatLimit(p.dl_limit, t)} span={2} />
+					<InfoCell label={t('torrentDetails.upLimit')} value={formatLimit(p.up_limit, t)} span={2} />
+					<InfoCell label={t('torrentDetails.ratio')} value={ratio} span={3} />
+					<InfoCell
+						label={t('torrentDetails.reannounce')}
+						value={p.reannounce > 0 ? formatDuration(p.reannounce) : '0'}
+						span={3}
+					/>
+					<InfoCell
+						label={t('torrentDetails.lastSeenComplete')}
+						value={p.last_seen > 0 ? formatDate(p.last_seen) : t('common.never')}
+						span={3}
+					/>
+					<InfoCell
+						label={t('torrentDetails.popularity')}
+						value={p.popularity !== undefined ? p.popularity.toFixed(2) : t('common.dash')}
+						span={3}
+					/>
 				</div>
 			</fieldset>
 
@@ -204,29 +235,48 @@ function GeneralTab({ hash, category, tags }: { hash: string; category: string; 
 					className="px-2 text-[9px] uppercase tracking-widest font-medium"
 					style={{ color: 'var(--text-muted)' }}
 				>
-					Information
+					{t('torrentDetails.information')}
 				</legend>
 				<div className="grid grid-cols-6 gap-1.5">
-					<InfoCell label="Total Size" value={formatSize(p.total_size)} />
-					<InfoCell label="Pieces" value={`${p.pieces_num} × ${formatSize(p.piece_size)} (have ${p.pieces_have})`} />
-					<InfoCell label="Created By" value={p.created_by || '—'} />
-					<InfoCell label="Added On" value={formatDate(p.addition_date)} />
-					<InfoCell label="Completed On" value={p.completion_date > 0 ? formatDate(p.completion_date) : '—'} />
-					<InfoCell label="Created On" value={p.creation_date > 0 ? formatDate(p.creation_date) : '—'} />
-					<InfoCell label="Private" value={p.is_private ? 'Yes' : 'No'} accent={p.is_private} span={2} />
-					<InfoCell label="Category" value={category || '—'} span={2} />
-					<InfoCell label="Tags" value={tags || '—'} span={2} />
+					<InfoCell label={t('torrentDetails.totalSize')} value={formatSize(p.total_size)} />
+					<InfoCell
+						label={t('torrentDetails.pieces')}
+						value={`${p.pieces_num} × ${formatSize(p.piece_size)} (have ${p.pieces_have})`}
+					/>
+					<InfoCell label={t('torrentDetails.createdBy')} value={p.created_by || t('common.dash')} />
+					<InfoCell label={t('torrentDetails.addedOn')} value={formatDate(p.addition_date)} />
+					<InfoCell
+						label={t('torrentDetails.completedOn')}
+						value={p.completion_date > 0 ? formatDate(p.completion_date) : t('common.dash')}
+					/>
+					<InfoCell
+						label={t('torrentDetails.createdOn')}
+						value={p.creation_date > 0 ? formatDate(p.creation_date) : t('common.dash')}
+					/>
+					<InfoCell
+						label={t('torrentDetails.private')}
+						value={p.is_private ? t('common.yes') : t('common.no')}
+						accent={p.is_private}
+						span={2}
+					/>
+					<InfoCell label={t('torrentDetails.category')} value={category || t('common.dash')} span={2} />
+					<InfoCell label={t('torrentDetails.tags')} value={tags || t('common.dash')} span={2} />
 				</div>
 				<div className="grid grid-cols-2 gap-1.5 mt-1.5">
-					<InfoCell label="Info Hash v1" value={p.infohash_v1 || hash} wide />
-					<InfoCell label="Info Hash v2" value={p.infohash_v2 || 'N/A'} muted={!p.infohash_v2} wide />
+					<InfoCell label={t('torrentDetails.infoHashV1')} value={p.infohash_v1 || hash} wide />
+					<InfoCell
+						label={t('torrentDetails.infoHashV2')}
+						value={p.infohash_v2 || t('common.notAvailable')}
+						muted={!p.infohash_v2}
+						wide
+					/>
 				</div>
 				<div className="mt-1.5">
-					<InfoCell label="Save Path" value={p.save_path} wide />
+					<InfoCell label={t('torrentDetails.savePath')} value={p.save_path} wide />
 				</div>
 				{p.comment && (
 					<div className="mt-1.5">
-						<InfoCell label="Comment" value={p.comment} wide />
+						<InfoCell label={t('torrentDetails.comment')} value={p.comment} wide />
 					</div>
 				)}
 			</fieldset>
@@ -235,6 +285,7 @@ function GeneralTab({ hash, category, tags }: { hash: string; category: string; 
 }
 
 function TrackersTab({ hash }: { hash: string }) {
+	const { t } = useTranslation()
 	const [adding, setAdding] = useState(false)
 	const [newUrl, setNewUrl] = useState('')
 	const { data: trackers, isLoading } = useTorrentTrackers(hash)
@@ -267,7 +318,7 @@ function TrackersTab({ hash }: { hash: string }) {
 							type="text"
 							value={newUrl}
 							onChange={(e) => setNewUrl(e.target.value)}
-							placeholder="Tracker URL (one per line)"
+							placeholder={t('torrentDetails.trackerUrlPlaceholder')}
 							className="flex-1 px-2 py-1 rounded text-xs border"
 							style={{
 								backgroundColor: 'var(--bg-secondary)',
@@ -285,14 +336,14 @@ function TrackersTab({ hash }: { hash: string }) {
 							className="px-2 py-1 rounded text-[10px] font-medium"
 							style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 						>
-							Add
+							{t('torrentDetails.add')}
 						</button>
 						<button
 							onClick={() => setAdding(false)}
 							className="px-2 py-1 rounded text-[10px] font-medium"
 							style={{ color: 'var(--text-muted)' }}
 						>
-							Cancel
+							{t('common.cancel')}
 						</button>
 					</div>
 				) : (
@@ -302,12 +353,12 @@ function TrackersTab({ hash }: { hash: string }) {
 						style={{ color: 'var(--accent)' }}
 					>
 						<Plus className="w-3 h-3" strokeWidth={2} />
-						Add Tracker
+						{t('torrentDetails.addTracker')}
 					</button>
 				)}
 			</div>
 			{allTrackers.length === 0 ? (
-				<EmptyState message="No trackers" />
+				<EmptyState message={t('torrentDetails.noTrackers')} />
 			) : (
 				<div className="overflow-auto flex-1">
 					<table className="w-full text-xs">
@@ -316,76 +367,88 @@ function TrackersTab({ hash }: { hash: string }) {
 							style={{ backgroundColor: 'color-mix(in srgb, var(--bg-secondary) 95%, transparent)' }}
 						>
 							<tr className="text-left border-b" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">Tier</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">
+									{t('torrentDetails.tier')}
+								</th>
 								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">URL</th>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">Status</th>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">Seeds</th>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">Leeches</th>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">Peers</th>
-								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">Downloaded</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">
+									{t('torrentDetails.status')}
+								</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+									{t('torrentDetails.seeds')}
+								</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+									{t('torrentDetails.leeches')}
+								</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+									{t('torrentDetails.peers')}
+								</th>
+								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+									{t('torrentDetails.downloadedCount')}
+								</th>
 								<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest"></th>
 							</tr>
 						</thead>
 						<tbody>
-							{dhtPexLsd.map((t: Tracker, i: number) => (
+							{dhtPexLsd.map((tr: Tracker, i: number) => (
 								<tr key={`dht-${i}`} className="border-t transition-colors" style={{ borderColor: 'var(--border)' }}>
 									<td className="px-3 py-1.5 font-mono" style={{ color: 'var(--text-muted)' }}>
-										—
+										{t('common.dash')}
 									</td>
 									<td className="px-3 py-1.5 font-medium" style={{ color: 'var(--accent)' }}>
-										{t.url.replace('** [', '').replace('] **', '')}
+										{tr.url.replace('** [', '').replace('] **', '')}
 									</td>
 									<td className="px-3 py-1.5">
-										<StatusBadge status={t.status} />
+										<StatusBadge status={tr.status} />
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--accent)' }}>
-										{t.num_seeds}
+										{tr.num_seeds}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--warning)' }}>
-										{t.num_leeches}
+										{tr.num_leeches}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--text-muted)' }}>
-										{t.num_peers}
+										{tr.num_peers}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--text-muted)' }}>
-										{t.num_downloaded}
+										{tr.num_downloaded}
 									</td>
 									<td className="px-3 py-1.5"></td>
 								</tr>
 							))}
-							{regularTrackers.map((t: Tracker, i: number) => (
+							{regularTrackers.map((tr: Tracker, i: number) => (
 								<tr key={i} className="border-t transition-colors group" style={{ borderColor: 'var(--border)' }}>
 									<td className="px-3 py-1.5 font-mono" style={{ color: 'var(--text-muted)' }}>
-										{t.tier}
+										{tr.tier}
 									</td>
 									<td
 										className="px-3 py-1.5 font-mono truncate max-w-[200px]"
 										style={{ color: 'var(--text-primary)' }}
-										title={t.url}
+										title={tr.url}
 									>
-										{t.url}
+										{tr.url}
 									</td>
 									<td className="px-3 py-1.5">
-										<StatusBadge status={t.status} />
+										<StatusBadge status={tr.status} />
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--accent)' }}>
-										{t.num_seeds}
+										{tr.num_seeds}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--warning)' }}>
-										{t.num_leeches}
+										{tr.num_leeches}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--text-muted)' }}>
-										{t.num_peers}
+										{tr.num_peers}
 									</td>
 									<td className="px-3 py-1.5 text-right font-mono" style={{ color: 'var(--text-muted)' }}>
-										{t.num_downloaded}
+										{tr.num_downloaded}
 									</td>
 									<td className="px-3 py-1.5 text-right">
 										<button
-											onClick={() => handleRemove(t.url)}
+											onClick={() => handleRemove(tr.url)}
 											className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"
 											style={{ color: 'var(--error)' }}
-											title="Remove tracker"
+											title={t('torrentDetails.removeTracker')}
 										>
 											<X className="w-3 h-3" strokeWidth={2} />
 										</button>
@@ -401,10 +464,11 @@ function TrackersTab({ hash }: { hash: string }) {
 }
 
 function PeersTab({ hash }: { hash: string }) {
+	const { t } = useTranslation()
 	const { data, isLoading } = useTorrentPeers(hash)
 	if (isLoading) return <LoadingSkeleton />
 	const peers = Object.values(data?.peers || {}) as Peer[]
-	if (peers.length === 0) return <EmptyState message="No peers" />
+	if (peers.length === 0) return <EmptyState message={t('torrentDetails.noPeers')} />
 	return (
 		<div className="overflow-auto h-full">
 			<table className="w-full text-xs">
@@ -413,12 +477,18 @@ function PeersTab({ hash }: { hash: string }) {
 					style={{ backgroundColor: 'color-mix(in srgb, var(--bg-secondary) 95%, transparent)' }}
 				>
 					<tr className="text-left border-b" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">IP</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">Client</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">Flags</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">Progress</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">DL</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">UP</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">{t('torrentDetails.ip')}</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">{t('torrentDetails.client')}</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">{t('torrentDetails.flags')}</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+							{t('torrentDetails.progress')}
+						</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+							{t('torrentDetails.download')}
+						</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right">
+							{t('torrentDetails.upload')}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -436,7 +506,7 @@ function PeersTab({ hash }: { hash: string }) {
 								{p.client}
 							</td>
 							<td className="px-3 py-1.5 font-mono" style={{ color: 'var(--text-muted)' }}>
-								{p.flags || '—'}
+								{p.flags || t('common.dash')}
 							</td>
 							<td className="px-3 py-1.5 text-right">
 								<div className="flex items-center justify-end gap-1.5">
@@ -469,9 +539,10 @@ function PeersTab({ hash }: { hash: string }) {
 }
 
 function HttpSourcesTab({ hash }: { hash: string }) {
+	const { t } = useTranslation()
 	const { data: seeds, isLoading } = useTorrentWebSeeds(hash)
 	if (isLoading) return <LoadingSkeleton />
-	if (!seeds || seeds.length === 0) return <EmptyState message="No HTTP sources" />
+	if (!seeds || seeds.length === 0) return <EmptyState message={t('torrentDetails.noHttpSources')} />
 	return (
 		<div className="p-3 space-y-1.5 overflow-auto h-full">
 			{seeds.map((s, i) => (
@@ -490,13 +561,6 @@ function HttpSourcesTab({ hash }: { hash: string }) {
 	)
 }
 
-const PRIORITY_OPTIONS = [
-	{ value: 0, label: 'Skip', color: 'var(--text-muted)' },
-	{ value: 1, label: 'Normal', color: 'var(--text-primary)' },
-	{ value: 6, label: 'High', color: 'var(--warning)' },
-	{ value: 7, label: 'Max', color: 'var(--accent)' },
-]
-
 const PRIORITY_TO_VALUE: Record<string, number> = { skip: 0, normal: 1, high: 6, max: 7 }
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -508,6 +572,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 }
 
 function ContentTabInner({ hash, files }: { hash: string; files: TorrentFile[] }) {
+	const { t } = useTranslation()
 	const setPriorityMutation = useSetFilePriority()
 	const tree = useMemo(() => buildFileTree(files), [files])
 	const [expanded, setExpanded] = useState<Set<string>>(() => getInitialExpanded(tree))
@@ -526,6 +591,13 @@ function ContentTabInner({ hash, files }: { hash: string; files: TorrentFile[] }
 		setPriorityMutation.mutate({ hash, ids: fileIndices, priority })
 	}
 
+	const priorityOptions = [
+		{ value: 0, label: t('torrentDetails.skip') },
+		{ value: 1, label: t('torrentDetails.normal') },
+		{ value: 6, label: t('torrentDetails.high') },
+		{ value: 7, label: t('torrentDetails.max') },
+	]
+
 	return (
 		<div className="overflow-auto h-full">
 			<table className="w-full text-xs">
@@ -534,10 +606,16 @@ function ContentTabInner({ hash, files }: { hash: string; files: TorrentFile[] }
 					style={{ backgroundColor: 'color-mix(in srgb, var(--bg-secondary) 95%, transparent)' }}
 				>
 					<tr className="text-left border-b" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">Name</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-20">Size</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-24">Progress</th>
-						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-20">Priority</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest">{t('torrentDetails.name')}</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-20">
+							{t('torrentDetails.size')}
+						</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-24">
+							{t('torrentDetails.progress')}
+						</th>
+						<th className="px-3 py-2 font-medium text-[9px] uppercase tracking-widest text-right w-20">
+							{t('torrentDetails.priority')}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -630,10 +708,10 @@ function ContentTabInner({ hash, files }: { hash: string; files: TorrentFile[] }
 									>
 										{isMixed && (
 											<option value="" disabled>
-												Mixed
+												{t('torrentDetails.mixed')}
 											</option>
 										)}
-										{PRIORITY_OPTIONS.map((p) => (
+										{priorityOptions.map((p) => (
 											<option
 												key={p.value}
 												value={p.value}
@@ -654,13 +732,15 @@ function ContentTabInner({ hash, files }: { hash: string; files: TorrentFile[] }
 }
 
 function ContentTab({ hash }: { hash: string }) {
+	const { t } = useTranslation()
 	const { data: files, isLoading } = useTorrentFiles(hash)
 	if (isLoading) return <LoadingSkeleton />
-	if (!files || files.length === 0) return <EmptyState message="No files" />
+	if (!files || files.length === 0) return <EmptyState message={t('torrentDetails.noFiles')} />
 	return <ContentTabInner key={hash} hash={hash} files={files} />
 }
 
 export function TorrentDetailsPanel({ hash, name, category, tags, expanded, onToggle, height, onHeightChange }: Props) {
+	const { t } = useTranslation()
 	const [tab, setTab] = useState<Tab>('general')
 	const [dragging, setDragging] = useState(false)
 	const dragStartY = useRef(0)
@@ -734,7 +814,7 @@ export function TorrentDetailsPanel({ hash, name, category, tags, expanded, onTo
 				<div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
 
 				<span className="text-[10px] uppercase tracking-widest font-medium" style={{ color: 'var(--text-muted)' }}>
-					Details
+					{t('torrentDetails.details')}
 				</span>
 
 				{hash && name && (
@@ -750,22 +830,22 @@ export function TorrentDetailsPanel({ hash, name, category, tags, expanded, onTo
 
 				{expanded && hash && (
 					<div className="flex items-center gap-0.5">
-						{TABS.map((t) => (
+						{TABS.map((tabItem) => (
 							<button
-								key={t.id}
+								key={tabItem.id}
 								onClick={(e) => {
 									e.stopPropagation()
-									setTab(t.id)
+									setTab(tabItem.id)
 								}}
 								className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-medium uppercase tracking-wide transition-all border"
 								style={{
-									backgroundColor: tab === t.id ? 'color-mix(in srgb, white 8%, transparent)' : 'transparent',
-									color: tab === t.id ? 'var(--text-secondary)' : 'var(--text-muted)',
-									borderColor: tab === t.id ? 'color-mix(in srgb, white 10%, transparent)' : 'transparent',
+									backgroundColor: tab === tabItem.id ? 'color-mix(in srgb, white 8%, transparent)' : 'transparent',
+									color: tab === tabItem.id ? 'var(--text-secondary)' : 'var(--text-muted)',
+									borderColor: tab === tabItem.id ? 'color-mix(in srgb, white 10%, transparent)' : 'transparent',
 								}}
 							>
-								<t.Icon className="w-3 h-3" strokeWidth={2} />
-								<span className="hidden lg:inline">{t.label}</span>
+								<tabItem.Icon className="w-3 h-3" strokeWidth={2} />
+								<span className="hidden lg:inline">{t(tabItem.labelKey)}</span>
 							</button>
 						))}
 					</div>
@@ -787,7 +867,7 @@ export function TorrentDetailsPanel({ hash, name, category, tags, expanded, onTo
 							<div className="text-center">
 								<MousePointer className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--border)' }} strokeWidth={1} />
 								<p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-									Select a torrent
+									{t('torrentDetails.selectTorrent')}
 								</p>
 							</div>
 						</div>

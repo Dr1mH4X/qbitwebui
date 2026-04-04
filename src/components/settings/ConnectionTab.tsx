@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Select, Checkbox } from '../ui'
 
@@ -6,29 +7,30 @@ interface Props {
 	onChange: (updates: Partial<QBittorrentPreferences>) => void
 }
 
-const PROTOCOL_OPTIONS = [
-	{ value: 0, label: 'TCP and µTP' },
-	{ value: 1, label: 'TCP' },
-	{ value: 2, label: 'µTP' },
-]
-
-const PROXY_TYPES = [
-	{ value: 0, label: '(None)' },
-	{ value: 1, label: 'HTTP' },
-	{ value: 2, label: 'SOCKS5' },
-	{ value: 3, label: 'HTTP with auth' },
-	{ value: 4, label: 'SOCKS5 with auth' },
-	{ value: 5, label: 'SOCKS4' },
-]
-
 export function ConnectionTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
 	const proxyEnabled = (preferences.proxy_type ?? 0) > 0
+
+	const PROTOCOL_OPTIONS = [
+		{ value: 0, label: t('settingsConnection.tcpUtp') },
+		{ value: 1, label: t('settingsConnection.tcp') },
+		{ value: 2, label: t('settingsConnection.utp') },
+	]
+
+	const PROXY_TYPES = [
+		{ value: 0, label: t('settingsConnection.none') },
+		{ value: 1, label: t('settingsConnection.http') },
+		{ value: 2, label: t('settingsConnection.socks5') },
+		{ value: 3, label: t('settingsConnection.httpAuth') },
+		{ value: 4, label: t('settingsConnection.socks5Auth') },
+		{ value: 5, label: t('settingsConnection.socks4') },
+	]
 
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center gap-4">
 				<label className="text-xs w-36 shrink-0" style={{ color: 'var(--text-muted)' }}>
-					Peer protocol
+					{t('settingsConnection.peerProtocol')}
 				</label>
 				<Select
 					value={preferences.bittorrent_protocol ?? 0}
@@ -41,12 +43,12 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Listening Port
+					{t('settingsConnection.port')}
 				</div>
 				<div className="grid grid-cols-2 gap-3">
 					<div className="flex items-center gap-2">
 						<label className="text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>
-							Port
+							{t('common.port')}
 						</label>
 						<input
 							type="number"
@@ -71,11 +73,11 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 								color: 'var(--text-muted)',
 							}}
 						>
-							Random
+							{t('settingsConnection.random')}
 						</button>
 					</div>
 					<Checkbox
-						label="Use UPnP / NAT-PMP"
+						label={t('settingsConnection.useUpnp')}
 						checked={preferences.upnp ?? true}
 						onChange={(v) => onChange({ upnp: v })}
 					/>
@@ -86,12 +88,12 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Connection Limits
+					{t('settingsConnection.connectionLimits')}
 				</div>
 				<div className="grid grid-cols-2 gap-x-6 gap-y-2">
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Global max connections"
+							label={t('settingsConnection.globalMaxConnections')}
 							checked={(preferences.max_connec ?? 500) > 0}
 							onChange={(v) => onChange({ max_connec: v ? 500 : 0 })}
 						/>
@@ -109,7 +111,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Per torrent"
+							label={t('settingsConnection.perTorrent')}
 							checked={(preferences.max_connec_per_torrent ?? 100) > 0}
 							onChange={(v) => onChange({ max_connec_per_torrent: v ? 100 : 0 })}
 						/>
@@ -127,7 +129,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Global upload slots"
+							label={t('settingsConnection.globalUploadSlots')}
 							checked={(preferences.max_uploads ?? 8) > 0}
 							onChange={(v) => onChange({ max_uploads: v ? 8 : 0 })}
 						/>
@@ -145,7 +147,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Per torrent"
+							label={t('settingsConnection.perTorrent')}
 							checked={(preferences.max_uploads_per_torrent ?? 4) > 0}
 							onChange={(v) => onChange({ max_uploads_per_torrent: v ? 4 : 0 })}
 						/>
@@ -174,14 +176,14 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ i2p_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						I2P (Experimental)
+						{t('settingsConnection.i2p')}
 					</span>
 				</div>
 				{preferences.i2p_enabled && (
 					<div className="flex items-center gap-4 pl-6">
 						<div className="flex items-center gap-2">
 							<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Host
+								{t('common.host')}
 							</label>
 							<input
 								type="text"
@@ -197,7 +199,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center gap-2">
 							<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Port
+								{t('common.port')}
 							</label>
 							<input
 								type="number"
@@ -212,7 +214,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 							/>
 						</div>
 						<Checkbox
-							label="Mixed mode"
+							label={t('settingsConnection.mixedMode')}
 							checked={preferences.i2p_mixed_mode ?? false}
 							onChange={(v) => onChange({ i2p_mixed_mode: v })}
 						/>
@@ -224,7 +226,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Proxy Server
+					{t('settingsConnection.proxyServer')}
 				</div>
 				<div className="flex items-center gap-3 mb-3">
 					<Select
@@ -239,7 +241,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 								type="text"
 								value={preferences.proxy_ip ?? ''}
 								onChange={(e) => onChange({ proxy_ip: e.target.value })}
-								placeholder="Host"
+								placeholder={t('common.host')}
 								className="flex-1 px-2 py-1.5 rounded border text-xs"
 								style={{
 									backgroundColor: 'var(--bg-tertiary)',
@@ -251,7 +253,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 								type="number"
 								value={preferences.proxy_port ?? 8080}
 								onChange={(e) => onChange({ proxy_port: parseInt(e.target.value) || 8080 })}
-								placeholder="Port"
+								placeholder={t('common.port')}
 								className="w-20 px-2 py-1.5 rounded border text-xs font-mono"
 								style={{
 									backgroundColor: 'var(--bg-tertiary)',
@@ -266,13 +268,13 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 				{proxyEnabled && (
 					<div className="space-y-2 pl-2">
 						<Checkbox
-							label="Hostname lookup via proxy"
+							label={t('settingsConnection.hostnameLookup')}
 							checked={preferences.proxy_hostname_lookup ?? false}
 							onChange={(v) => onChange({ proxy_hostname_lookup: v })}
 						/>
 						<div className="p-2 rounded space-y-2" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 							<Checkbox
-								label="Authentication"
+								label={t('settingsConnection.authentication')}
 								checked={preferences.proxy_auth_enabled ?? false}
 								onChange={(v) => onChange({ proxy_auth_enabled: v })}
 							/>
@@ -282,7 +284,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 										type="text"
 										value={preferences.proxy_username ?? ''}
 										onChange={(e) => onChange({ proxy_username: e.target.value })}
-										placeholder="Username"
+										placeholder={t('common.username')}
 										className="w-32 px-2 py-1.5 rounded border text-xs"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -294,7 +296,7 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 										type="password"
 										value={preferences.proxy_password ?? ''}
 										onChange={(e) => onChange({ proxy_password: e.target.value })}
-										placeholder="Password"
+										placeholder={t('common.password')}
 										className="w-32 px-2 py-1.5 rounded border text-xs"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -307,24 +309,24 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 						</div>
 						<div className="grid grid-cols-2 gap-2">
 							<Checkbox
-								label="Use for BitTorrent"
+								label={t('settingsConnection.useForBittorrent')}
 								checked={preferences.proxy_bittorrent ?? true}
 								onChange={(v) => onChange({ proxy_bittorrent: v })}
 							/>
 							{preferences.proxy_bittorrent && (
 								<Checkbox
-									label="Use for peer connections"
+									label={t('settingsConnection.useForPeers')}
 									checked={preferences.proxy_peer_connections ?? false}
 									onChange={(v) => onChange({ proxy_peer_connections: v })}
 								/>
 							)}
 							<Checkbox
-								label="Use for RSS"
+								label={t('settingsConnection.useForRss')}
 								checked={preferences.proxy_rss ?? true}
 								onChange={(v) => onChange({ proxy_rss: v })}
 							/>
 							<Checkbox
-								label="Use for general"
+								label={t('settingsConnection.useForGeneral')}
 								checked={preferences.proxy_misc ?? true}
 								onChange={(v) => onChange({ proxy_misc: v })}
 							/>
@@ -337,12 +339,12 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					IP Filtering
+					{t('settingsConnection.ipFiltering')}
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Filter path"
+							label={t('settingsConnection.filterPath')}
 							checked={preferences.ip_filter_enabled ?? false}
 							onChange={(v) => onChange({ ip_filter_enabled: v })}
 						/>
@@ -361,19 +363,19 @@ export function ConnectionTab({ preferences, onChange }: Props) {
 						/>
 					</div>
 					<Checkbox
-						label="Apply to trackers"
+						label={t('settingsConnection.applyToTrackers')}
 						checked={preferences.ip_filter_trackers ?? false}
 						onChange={(v) => onChange({ ip_filter_trackers: v })}
 					/>
 					<div>
 						<label className="text-xs mb-1 block" style={{ color: 'var(--text-muted)' }}>
-							Banned IPs
+							{t('settingsConnection.bannedIps')}
 						</label>
 						<textarea
 							value={preferences.banned_IPs ?? ''}
 							onChange={(e) => onChange({ banned_IPs: e.target.value })}
 							rows={3}
-							placeholder="One per line"
+							placeholder={t('settingsConnection.onePerLine')}
 							className="w-full px-2 py-1.5 rounded border text-xs font-mono resize-none"
 							style={{
 								backgroundColor: 'var(--bg-tertiary)',

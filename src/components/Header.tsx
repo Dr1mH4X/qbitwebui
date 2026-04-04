@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Check, Info, User, Lock, LogOut } from 'lucide-react'
+import { Check, Info, User, Lock, LogOut, ChevronDown } from 'lucide-react'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { useUpdateCheck } from '../hooks/useUpdateCheck'
+import { useI18n } from '../hooks/useI18n'
 import { renderMarkdown } from '../utils/markdown'
 
 declare const __APP_VERSION__: string
@@ -19,6 +20,7 @@ interface Props {
 
 export function Header({ activeTab, onTabChange, username, authDisabled, onLogout, onPasswordChange }: Props) {
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
+	const [langMenuOpen, setLangMenuOpen] = useState(false)
 	const {
 		hasUpdate,
 		latestVersion,
@@ -27,6 +29,12 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 		isLoading: updateLoading,
 		error: updateError,
 	} = useUpdateCheck()
+	const { t, locale, setLocale } = useI18n()
+
+	const languages = [
+		{ code: 'en', label: 'English' },
+		{ code: 'zh-CN', label: '简体中文' },
+	]
 
 	return (
 		<header className="flex items-center justify-between px-6 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
@@ -39,25 +47,70 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 				</div>
 				<div className="flex items-center gap-1 p-1 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
 					{[
-						{ id: 'dashboard' as Tab, label: 'Dashboard' },
-						{ id: 'tools' as Tab, label: 'Tools' },
-					].map((t) => (
+						{ id: 'dashboard' as Tab, label: t('header.dashboard') },
+						{ id: 'tools' as Tab, label: t('header.tools') },
+					].map((tab) => (
 						<button
-							key={t.id}
-							onClick={() => onTabChange?.(t.id)}
+							key={tab.id}
+							onClick={() => onTabChange?.(tab.id)}
 							className="px-3 py-1 rounded-md text-xs font-medium transition-all"
 							style={{
-								backgroundColor: activeTab === t.id ? 'var(--bg-primary)' : 'transparent',
-								color: activeTab === t.id ? 'var(--text-primary)' : 'var(--text-muted)',
-								boxShadow: activeTab === t.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+								backgroundColor: activeTab === tab.id ? 'var(--bg-primary)' : 'transparent',
+								color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-muted)',
+								boxShadow: activeTab === tab.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
 							}}
 						>
-							{t.label}
+							{tab.label}
 						</button>
 					))}
 				</div>
 			</div>
 			<div className="flex items-center gap-3">
+				<div className="relative">
+					<button
+						onClick={() => setLangMenuOpen(!langMenuOpen)}
+						className="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors"
+						style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)' }}
+						title={t('settingsBehavior.language')}
+					>
+						<span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+							{languages.find((l) => l.code === locale)?.label || 'English'}
+						</span>
+						<ChevronDown
+							className={`w-3 h-3 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`}
+							style={{ color: 'var(--text-muted)' }}
+							strokeWidth={2}
+						/>
+					</button>
+					{langMenuOpen && (
+						<>
+							<div className="fixed inset-0 z-10" onClick={() => setLangMenuOpen(false)} />
+							<div
+								className="absolute right-0 top-full mt-2 z-20 w-48 py-1 rounded-lg border shadow-xl overflow-hidden"
+								style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)' }}
+							>
+								{languages.map((lang) => (
+									<button
+										key={lang.code}
+										onClick={() => {
+											setLocale(lang.code)
+											setLangMenuOpen(false)
+										}}
+										className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors"
+										style={{
+											backgroundColor:
+												locale === lang.code ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
+											color: locale === lang.code ? 'var(--accent)' : 'var(--text-secondary)',
+										}}
+									>
+										<span className="text-xs font-medium truncate">{lang.label}</span>
+										{locale === lang.code && <Check className="w-3 h-3 ml-auto shrink-0" strokeWidth={3} />}
+									</button>
+								))}
+							</div>
+						</>
+					)}
+				</div>
 				<ThemeSwitcher />
 				<div className="relative group">
 					<div
@@ -67,14 +120,14 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 							borderColor: 'var(--border)',
 							color: 'var(--text-muted)',
 						}}
-						title={hasUpdate ? `Update available: v${latestVersion}` : 'Up to date'}
+						title={hasUpdate ? t('header.updateAvailable', { version: latestVersion }) : t('header.upToDate')}
 						tabIndex={0}
 					>
 						v{__APP_VERSION__}
 						{hasUpdate ? (
 							<Info className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} strokeWidth={2} />
 						) : (
-							<Check className="w-3.5 h-3.5" style={{ color: '#a6e3a1' }} strokeWidth={2.5} />
+							<Check className="w-3.5 h-3.5" style={{ color: '#a6e3a3' }} strokeWidth={2.5} />
 						)}
 					</div>
 					<div className="absolute right-0 top-full mt-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition">
@@ -84,7 +137,8 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 						>
 							<div className="flex items-center justify-between mb-2">
 								<span className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
-									Release notes{latestVersion ? ` v${latestVersion}` : ''}
+									{t('header.releaseNotes')}
+									{latestVersion ? ` v${latestVersion}` : ''}
 								</span>
 								{releaseUrl && (
 									<a
@@ -94,23 +148,23 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 										className="text-[10px] uppercase tracking-wide"
 										style={{ color: 'var(--accent)' }}
 									>
-										View
+										{t('header.view')}
 									</a>
 								)}
 							</div>
 							{updateLoading ? (
 								<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Loading release notes...
+									{t('header.loadingReleaseNotes')}
 								</p>
 							) : updateError ? (
 								<p className="text-xs" style={{ color: 'var(--error)' }}>
-									Failed to load release notes.
+									{t('header.failedToLoadReleaseNotes')}
 								</p>
 							) : releaseNotes ? (
 								<div className="space-y-2">{renderMarkdown(releaseNotes)}</div>
 							) : (
 								<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									No release notes available.
+									{t('header.noReleaseNotes')}
 								</p>
 							)}
 						</div>
@@ -147,7 +201,7 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 											style={{ color: 'var(--text-primary)' }}
 										>
 											<Lock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
-											Change Password
+											{t('header.changePassword')}
 										</button>
 									)}
 									{onLogout && (
@@ -160,7 +214,7 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 											style={{ color: 'var(--error)' }}
 										>
 											<LogOut className="w-4 h-4" strokeWidth={1.5} />
-											Logout
+											{t('header.logout')}
 										</button>
 									)}
 								</div>

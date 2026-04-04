@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Checkbox } from '../ui'
 
@@ -7,22 +8,23 @@ interface Props {
 }
 
 export function RSSTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
 	return (
 		<div className="space-y-4">
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					RSS Reader
+					{t('settingsRss.rssReader')}
 				</div>
 				<div className="space-y-2">
 					<Checkbox
-						label="Enable fetching RSS feeds"
+						label={t('settingsRss.enableFetching')}
 						checked={preferences.rss_processing_enabled ?? false}
 						onChange={(v) => onChange({ rss_processing_enabled: v })}
 					/>
 					<div className="grid grid-cols-3 gap-2">
 						<div className="flex items-center gap-2">
 							<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Refresh
+								{t('settingsRss.refresh')}
 							</label>
 							<input
 								type="number"
@@ -37,12 +39,12 @@ export function RSSTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								min
+								{t('settingsRss.min')}
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Delay
+								{t('settingsRss.delay')}
 							</label>
 							<input
 								type="number"
@@ -57,12 +59,12 @@ export function RSSTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								sec
+								{t('settingsRss.sec')}
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Max articles
+								{t('settingsRss.maxArticles')}
 							</label>
 							<input
 								type="number"
@@ -85,10 +87,10 @@ export function RSSTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					RSS Torrent Auto Downloader
+					{t('settingsRss.autoDownloader')}
 				</div>
 				<Checkbox
-					label="Enable auto downloading of RSS torrents"
+					label={t('settingsRss.enableAutoDownload')}
 					checked={preferences.rss_auto_downloading_enabled ?? false}
 					onChange={(v) => onChange({ rss_auto_downloading_enabled: v })}
 				/>
@@ -98,17 +100,17 @@ export function RSSTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					RSS Smart Episode Filter
+					{t('settingsRss.smartEpisodeFilter')}
 				</div>
 				<div className="space-y-2">
 					<Checkbox
-						label="Download REPACK/PROPER episodes"
+						label={t('settingsRss.downloadRepack')}
 						checked={preferences.rss_download_repack_proper_episodes ?? true}
 						onChange={(v) => onChange({ rss_download_repack_proper_episodes: v })}
 					/>
 					<div>
 						<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-							Filters
+							{t('settingsRss.filters')}
 						</label>
 						<textarea
 							value={preferences.rss_smart_episode_filters ?? ''}

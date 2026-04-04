@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Download } from 'lucide-react'
 import { register, login, type User } from '../api/auth'
 
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function AuthForm({ onSuccess }: Props) {
+	const { t } = useTranslation()
 	const [mode, setMode] = useState<'login' | 'register'>('login')
 	const [registrationDisabled, setRegistrationDisabled] = useState<boolean | null>(null)
 
@@ -27,7 +29,7 @@ export function AuthForm({ onSuccess }: Props) {
 		setError('')
 
 		if (mode === 'register' && password !== confirmPassword) {
-			setError('Passwords do not match')
+			setError(t('auth.passwordsDoNotMatch'))
 			return
 		}
 
@@ -36,7 +38,7 @@ export function AuthForm({ onSuccess }: Props) {
 			const user = mode === 'register' ? await register(username, password) : await login(username, password)
 			onSuccess(user)
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Operation failed')
+			setError(err instanceof Error ? err.message : t('common.operationFailed'))
 		} finally {
 			setLoading(false)
 		}
@@ -83,7 +85,7 @@ export function AuthForm({ onSuccess }: Props) {
 						</div>
 						<div>
 							<h1 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-								qbitwebui
+								{t('app.appName')}
 							</h1>
 						</div>
 					</div>
@@ -102,7 +104,7 @@ export function AuthForm({ onSuccess }: Props) {
 									color: mode === 'login' ? 'var(--text-primary)' : 'var(--text-muted)',
 								}}
 							>
-								Sign In
+								{t('auth.signIn')}
 							</button>
 							<button
 								type="button"
@@ -116,7 +118,7 @@ export function AuthForm({ onSuccess }: Props) {
 									color: mode === 'register' ? 'var(--text-primary)' : 'var(--text-muted)',
 								}}
 							>
-								Register
+								{t('auth.register')}
 							</button>
 						</div>
 					)}
@@ -136,7 +138,7 @@ export function AuthForm({ onSuccess }: Props) {
 								className="block text-xs font-medium mb-2 uppercase tracking-wider"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Username
+								{t('common.username')}
 							</label>
 							<input
 								type="text"
@@ -148,7 +150,7 @@ export function AuthForm({ onSuccess }: Props) {
 									borderColor: 'var(--border)',
 									color: 'var(--text-primary)',
 								}}
-								placeholder="username"
+								placeholder={t('common.username')}
 								autoComplete="username"
 								required
 							/>
@@ -159,7 +161,7 @@ export function AuthForm({ onSuccess }: Props) {
 								className="block text-xs font-medium mb-2 uppercase tracking-wider"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Password
+								{t('common.password')}
 							</label>
 							<input
 								type="password"
@@ -183,7 +185,7 @@ export function AuthForm({ onSuccess }: Props) {
 									className="block text-xs font-medium mb-2 uppercase tracking-wider"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Confirm Password
+									{t('auth.confirmPassword')}
 								</label>
 								<input
 									type="password"
@@ -212,16 +214,16 @@ export function AuthForm({ onSuccess }: Props) {
 						}}
 					>
 						<span className="relative font-semibold" style={{ color: 'var(--accent-contrast)' }}>
-							{loading ? 'Please wait...' : mode === 'register' ? 'Create Account' : 'Sign In'}
+							{loading ? t('common.pleaseWait') : mode === 'register' ? t('auth.createAccount') : t('auth.signIn')}
 						</span>
 					</button>
 
 					<p className="mt-6 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
 						{mode === 'register' && registrationDisabled === false
-							? 'Create an account to manage your instances'
+							? t('auth.registerDesc')
 							: registrationDisabled
-								? 'Registration is disabled. Contact administrator for access.'
-								: 'Sign in to manage your qBittorrent instances'}
+								? t('auth.registrationDisabled')
+								: t('auth.signInDesc')}
 					</p>
 				</div>
 			</form>

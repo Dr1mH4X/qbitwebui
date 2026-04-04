@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Toggle, Select, Checkbox } from '../ui'
 
@@ -6,29 +7,31 @@ interface Props {
 	onChange: (updates: Partial<QBittorrentPreferences>) => void
 }
 
-const CONTENT_LAYOUT_OPTIONS = [
-	{ value: 'Original', label: 'Original' },
-	{ value: 'Subfolder', label: 'Create subfolder' },
-	{ value: 'NoSubfolder', label: "Don't create subfolder" },
-]
-
-const STOP_CONDITION_OPTIONS = [
-	{ value: 'None', label: 'None' },
-	{ value: 'MetadataReceived', label: 'Metadata received' },
-	{ value: 'FilesChecked', label: 'Files checked' },
-]
-
 export function DownloadsTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
+
+	const CONTENT_LAYOUT_OPTIONS = [
+		{ value: 'Original', label: t('settingsDownloads.original') },
+		{ value: 'Subfolder', label: t('settingsDownloads.createSubfolder') },
+		{ value: 'NoSubfolder', label: t('settingsDownloads.noSubfolder') },
+	]
+
+	const STOP_CONDITION_OPTIONS = [
+		{ value: 'None', label: t('common.none') },
+		{ value: 'MetadataReceived', label: t('settingsDownloads.metadataReceived') },
+		{ value: 'FilesChecked', label: t('settingsDownloads.filesChecked') },
+	]
+
 	return (
 		<div className="space-y-4">
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					When adding a torrent
+					{t('settingsDownloads.whenAdding')}
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center gap-3">
 						<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Content layout
+							{t('settingsDownloads.contentLayout')}
 						</label>
 						<Select
 							value={preferences.torrent_content_layout ?? 'Original'}
@@ -39,7 +42,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-3">
 						<label className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Stop condition
+							{t('settingsDownloads.stopCondition')}
 						</label>
 						<Select
 							value={preferences.torrent_stop_condition ?? 'None'}
@@ -50,22 +53,22 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="grid grid-cols-2 gap-2">
 						<Checkbox
-							label="Add to top of queue"
+							label={t('settingsDownloads.addToTop')}
 							checked={preferences.add_to_top_of_queue ?? false}
 							onChange={(v) => onChange({ add_to_top_of_queue: v })}
 						/>
 						<Checkbox
-							label="Don't start automatically"
+							label={t('settingsDownloads.dontStartAuto')}
 							checked={preferences.add_stopped_enabled ?? false}
 							onChange={(v) => onChange({ add_stopped_enabled: v })}
 						/>
 						<Checkbox
-							label="Merge trackers on duplicate"
+							label={t('settingsDownloads.mergeTrackers')}
 							checked={preferences.merge_trackers ?? false}
 							onChange={(v) => onChange({ merge_trackers: v })}
 						/>
 						<Checkbox
-							label="Delete .torrent files"
+							label={t('settingsDownloads.deleteTorrentFiles')}
 							checked={(preferences.auto_delete_mode ?? 0) > 0}
 							onChange={(v) => onChange({ auto_delete_mode: v ? 1 : 0 })}
 						/>
@@ -77,21 +80,21 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Pre-allocation & Extensions
+					{t('settingsDownloads.preallocation')}
 				</div>
 				<div className="grid grid-cols-2 gap-2">
 					<Checkbox
-						label="Pre-allocate disk space"
+						label={t('settingsDownloads.preallocateSpace')}
 						checked={preferences.preallocate_all ?? false}
 						onChange={(v) => onChange({ preallocate_all: v })}
 					/>
 					<Checkbox
-						label="Append .!qB to incomplete"
+						label={t('settingsDownloads.appendExtension')}
 						checked={preferences.incomplete_files_ext ?? false}
 						onChange={(v) => onChange({ incomplete_files_ext: v })}
 					/>
 					<Checkbox
-						label='Keep unselected in ".unwanted"'
+						label={t('settingsDownloads.keepUnwanted')}
 						checked={preferences.use_unwanted_folder ?? false}
 						onChange={(v) => onChange({ use_unwanted_folder: v })}
 					/>
@@ -102,19 +105,19 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Saving Management
+					{t('settingsDownloads.savingManagement')}
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Default Torrent Management Mode
+							{t('settingsDownloads.defaultMode')}
 						</span>
 						<div className="flex items-center gap-2">
 							<span
 								className="text-xs"
 								style={{ color: preferences.auto_tmm_enabled ? 'var(--text-muted)' : 'var(--text-primary)' }}
 							>
-								Manual
+								{t('settingsDownloads.manual')}
 							</span>
 							<Toggle
 								checked={preferences.auto_tmm_enabled ?? false}
@@ -124,14 +127,14 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 								className="text-xs"
 								style={{ color: preferences.auto_tmm_enabled ? 'var(--text-primary)' : 'var(--text-muted)' }}
 							>
-								Auto
+								{t('settingsDownloads.auto')}
 							</span>
 						</div>
 					</div>
 					<div className="grid grid-cols-2 gap-x-4 gap-y-1">
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Relocate on category change
+								{t('settingsDownloads.relocateOnCategory')}
 							</span>
 							<Toggle
 								checked={preferences.torrent_changed_tmm_enabled ?? false}
@@ -140,7 +143,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Relocate on default path change
+								{t('settingsDownloads.relocateOnDefaultPath')}
 							</span>
 							<Toggle
 								checked={preferences.save_path_changed_tmm_enabled ?? false}
@@ -149,7 +152,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Relocate on category path change
+								{t('settingsDownloads.relocateOnCategoryPath')}
 							</span>
 							<Toggle
 								checked={preferences.category_changed_tmm_enabled ?? false}
@@ -159,19 +162,19 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="grid grid-cols-2 gap-2">
 						<Checkbox
-							label="Use Subcategories"
+							label={t('settingsDownloads.useSubcategories')}
 							checked={preferences.use_subcategories ?? false}
 							onChange={(v) => onChange({ use_subcategories: v })}
 						/>
 						<Checkbox
-							label="Category paths in Manual Mode"
+							label={t('settingsDownloads.categoryPathsManual')}
 							checked={preferences.use_category_paths_in_manual_mode ?? false}
 							onChange={(v) => onChange({ use_category_paths_in_manual_mode: v })}
 						/>
 					</div>
 					<div>
 						<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-							Default Save Path
+							{t('settingsDownloads.defaultSavePath')}
 						</label>
 						<input
 							type="text"
@@ -187,7 +190,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Keep incomplete in:"
+							label={t('settingsDownloads.keepIncomplete')}
 							checked={preferences.temp_path_enabled ?? false}
 							onChange={(v) => onChange({ temp_path_enabled: v })}
 						/>
@@ -207,7 +210,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Copy .torrent to:"
+							label={t('settingsDownloads.copyTorrentTo')}
 							checked={preferences.export_dir !== undefined && preferences.export_dir !== ''}
 							onChange={(v) => onChange({ export_dir: v ? preferences.export_dir || '' : '' })}
 						/>
@@ -227,7 +230,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="Copy finished .torrent to:"
+							label={t('settingsDownloads.copyFinishedTo')}
 							checked={preferences.export_dir_fin !== undefined && preferences.export_dir_fin !== ''}
 							onChange={(v) => onChange({ export_dir_fin: v ? preferences.export_dir_fin || '' : '' })}
 						/>
@@ -258,7 +261,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ excluded_file_names_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Excluded file names
+						{t('settingsDownloads.excludedFileNames')}
 					</span>
 				</div>
 				{preferences.excluded_file_names_enabled && (
@@ -287,7 +290,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						onChange={(v) => onChange({ mail_notification_enabled: v })}
 					/>
 					<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-						Email notification
+						{t('settingsDownloads.emailNotification')}
 					</span>
 				</div>
 				{preferences.mail_notification_enabled && (
@@ -295,7 +298,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-2 gap-2">
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									From
+									{t('settingsDownloads.from')}
 								</label>
 								<input
 									type="text"
@@ -311,7 +314,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 							</div>
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									To
+									{t('settingsDownloads.to')}
 								</label>
 								<input
 									type="email"
@@ -329,7 +332,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						<div className="flex items-center gap-2">
 							<div className="flex-1">
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									SMTP server
+									{t('settingsDownloads.smtpServer')}
 								</label>
 								<input
 									type="text"
@@ -344,14 +347,14 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 								/>
 							</div>
 							<Checkbox
-								label="SSL"
+								label={t('settingsDownloads.ssl')}
 								checked={preferences.mail_notification_ssl_enabled ?? false}
 								onChange={(v) => onChange({ mail_notification_ssl_enabled: v })}
 							/>
 						</div>
 						<div className="p-2 rounded space-y-2" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 							<Checkbox
-								label="Authentication"
+								label={t('settingsDownloads.authentication')}
 								checked={preferences.mail_notification_auth_enabled ?? false}
 								onChange={(v) => onChange({ mail_notification_auth_enabled: v })}
 							/>
@@ -361,7 +364,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 										type="text"
 										value={preferences.mail_notification_username ?? ''}
 										onChange={(e) => onChange({ mail_notification_username: e.target.value })}
-										placeholder="Username"
+										placeholder={t('common.username')}
 										className="px-2 py-1.5 rounded border text-xs"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -373,7 +376,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 										type="password"
 										value={preferences.mail_notification_password ?? ''}
 										onChange={(e) => onChange({ mail_notification_password: e.target.value })}
-										placeholder="Password"
+										placeholder={t('common.password')}
 										className="px-2 py-1.5 rounded border text-xs"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -392,12 +395,12 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Run external program
+					{t('settingsDownloads.runExternalProgram')}
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="On torrent added:"
+							label={t('settingsDownloads.onTorrentAdded')}
 							checked={preferences.autorun_on_torrent_added_enabled ?? false}
 							onChange={(v) => onChange({ autorun_on_torrent_added_enabled: v })}
 						/>
@@ -417,7 +420,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Checkbox
-							label="On torrent finished:"
+							label={t('settingsDownloads.onTorrentFinished')}
 							checked={preferences.autorun_enabled ?? false}
 							onChange={(v) => onChange({ autorun_enabled: v })}
 						/>
@@ -436,8 +439,7 @@ export function DownloadsTab({ preferences, onChange }: Props) {
 						)}
 					</div>
 					<p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-						Params: %N (name), %L (category), %G (tags), %F (content path), %R (root path), %D (save path), %C (files),
-						%Z (size), %T (tracker), %I (hash v1), %J (hash v2), %K (ID)
+						{t('settingsDownloads.paramsHint')}
 					</p>
 				</div>
 			</div>

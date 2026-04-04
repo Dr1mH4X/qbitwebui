@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	ChevronUp,
 	ChevronDown,
@@ -39,7 +40,7 @@ import { loadRatioThreshold, saveRatioThreshold } from '../utils/ratioThresholds
 import { loadHideAddedTime, saveHideAddedTime } from '../utils/dateSettings'
 import { loadCustomViews, saveCustomViews, createView, viewsAreEqual } from '../utils/customViews'
 import { normalizeSearch } from '../utils/format'
-import { COLUMNS, DEFAULT_VISIBLE_COLUMNS, DEFAULT_COLUMN_ORDER, type SortKey } from './columns'
+import { createColumns, DEFAULT_VISIBLE_COLUMNS, DEFAULT_COLUMN_ORDER, type SortKey } from './columns'
 import { usePagination } from '../hooks/usePagination'
 
 const AddTorrentModal = lazy(() => import('./AddTorrentModal').then((m) => ({ default: m.AddTorrentModal })))
@@ -88,6 +89,8 @@ function ActionButton({
 }
 
 export function TorrentList() {
+	const { t } = useTranslation()
+	const columns = useMemo(() => createColumns((key) => t(`columns.${key}` as any)), [t])
 	const [filter, setFilter] = useState<TorrentFilter>('all')
 	const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
 	const [tagFilter, setTagFilter] = useState<string | null>(null)
@@ -97,7 +100,7 @@ export function TorrentList() {
 	const [lastSelected, setLastSelected] = useState<string | null>(null)
 	const [sortKey, setSortKey] = useState<SortKey>(() => {
 		const stored = localStorage.getItem('sortKey')
-		if (stored && COLUMNS.some((c) => c.sortKey === stored || stored === 'name')) return stored as SortKey
+		if (stored && columns.some((c) => c.sortKey === stored || stored === 'name')) return stored as SortKey
 		return 'name'
 	})
 	const [sortAsc, setSortAsc] = useState(() => {
@@ -130,7 +133,7 @@ export function TorrentList() {
 		if (stored) {
 			const parsed = JSON.parse(stored)
 			if (Array.isArray(parsed)) {
-				const known = new Set(COLUMNS.map((c) => c.id))
+				const known = new Set(columns.map((c) => c.id))
 				const cleaned = parsed.filter((id) => known.has(id))
 				const missing = DEFAULT_COLUMN_ORDER.filter((id) => !cleaned.includes(id))
 				const merged = [...cleaned, ...missing]
@@ -314,8 +317,8 @@ export function TorrentList() {
 	}
 
 	const orderedColumns = columnOrder
-		.map((id) => COLUMNS.find((c) => c.id === id))
-		.filter((c): c is (typeof COLUMNS)[number] => c !== undefined)
+		.map((id) => columns.find((c) => c.id === id))
+		.filter((c): c is (typeof columns)[number] => c !== undefined)
 
 	const { data: categories = {} } = useCategories()
 	const { data: tags = [] } = useTags()
@@ -499,28 +502,28 @@ export function TorrentList() {
 					<ActionButton
 						onClick={() => setAddModal(true)}
 						disabled={false}
-						label="Add Torrent"
+						label={t('torrentList.addTorrent')}
 						colorVar="var(--accent)"
 						icon={Plus}
 					/>
 					<ActionButton
 						onClick={handleStart}
 						disabled={!hasSelection}
-						label="Start"
+						label={t('torrentList.start')}
 						colorVar="var(--accent)"
 						icon={Play}
 					/>
 					<ActionButton
 						onClick={handleStop}
 						disabled={!hasSelection}
-						label="Stop"
+						label={t('torrentList.stop')}
 						colorVar="var(--warning)"
 						icon={Square}
 					/>
 					<ActionButton
 						onClick={() => setDeleteModal(true)}
 						disabled={!hasSelection}
-						label="Delete"
+						label={t('torrentList.delete')}
 						colorVar="var(--error)"
 						icon={Trash2}
 					/>
@@ -554,7 +557,7 @@ export function TorrentList() {
 					/>
 					<ManageButton onClick={() => setManagerModal(true)} />
 					<ColumnSelector
-						columns={COLUMNS}
+						columns={columns}
 						visible={visibleColumns}
 						onChange={handleColumnChange}
 						columnOrder={columnOrder}
@@ -585,14 +588,14 @@ export function TorrentList() {
 							}}
 						/>
 						<span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-							Loading
+							{t('torrentList.loading')}
 						</span>
 					</div>
 				) : filtered.length === 0 ? (
 					<div className="flex flex-col items-center justify-center h-48 gap-2">
 						<Archive className="w-10 h-10" style={{ color: 'var(--border)' }} strokeWidth={1} />
 						<span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-							No torrents
+							{t('torrentList.noTorrents')}
 						</span>
 					</div>
 				) : (
@@ -622,22 +625,17 @@ export function TorrentList() {
 											{selected.size === filtered.length && filtered.length > 0 && (
 												<Square className="w-2.5 h-2.5 fill-current" style={{ color: 'var(--accent)' }} />
 											)}
-											{selected.size > 0 &&
-												selected.size < filtered.length &&
+											{selected.size > 0 && selected.size < filtered.length && (
 												// Indeterminate state icon (minus/dash)
-												(
-													<div
-														className="w-2 h-0.5 rounded-full"
-														style={{ backgroundColor: 'var(--accent)' }}
-													/>
-												)}
+												<div className="w-2 h-0.5 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />
+											)}
 										</button>
 										<button
 											onClick={() => handleSort('name')}
 											className="flex items-center gap-2 text-[9px] font-medium uppercase tracking-widest transition-colors"
 											style={{ color: 'var(--text-muted)' }}
 										>
-											Name
+											{t('columns.name')}
 											<SortIcon active={sortKey === 'name'} asc={sortAsc} />
 										</button>
 									</div>
@@ -658,13 +656,13 @@ export function TorrentList() {
 														className="flex items-center gap-2 text-[9px] font-medium uppercase tracking-widest transition-colors"
 														style={{ color: 'var(--text-muted)' }}
 													>
-														Ratio
+														{t('columns.ratio')}
 														<SortIcon active={sortKey === 'ratio'} asc={sortAsc} />
 													</button>
 													<button
 														onClick={(e) => setRatioPopupAnchor(e.currentTarget)}
 														className="p-0.5 rounded opacity-50 hover:opacity-100 transition-opacity"
-														title="Configure ratio colors"
+														title={t('torrentList.configureRatioColors')}
 													>
 														<Settings className="w-3 h-3" style={{ color: 'var(--text-muted)' }} strokeWidth={2} />
 													</button>
@@ -682,7 +680,7 @@ export function TorrentList() {
 													<button
 														onClick={(e) => setDatePopupAnchor(e.currentTarget)}
 														className="p-0.5 rounded opacity-50 hover:opacity-100 transition-opacity"
-														title="Date display settings"
+														title={t('torrentList.dateDisplaySettings')}
 													>
 														<Settings className="w-3 h-3" style={{ color: 'var(--text-muted)' }} strokeWidth={2} />
 													</button>
@@ -705,7 +703,7 @@ export function TorrentList() {
 															style={{ backgroundColor: 'color-mix(in srgb, var(--warning) 40%, transparent)' }}
 														/>
 													)}
-													{col.id === 'dlspeed' || col.id === 'upspeed' ? 'Speed' : col.label}
+													{col.id === 'dlspeed' || col.id === 'upspeed' ? t('torrentList.speed') : col.label}
 													<SortIcon active={sortKey === col.sortKey} asc={sortAsc} />
 												</button>
 											) : (
@@ -724,7 +722,7 @@ export function TorrentList() {
 										<button
 											onClick={handleResetWidths}
 											className="p-1 rounded opacity-50 hover:opacity-100 transition-opacity"
-											title="Reset column widths"
+											title={t('torrentList.resetColumnWidths')}
 										>
 											<Maximize2 className="w-3 h-3" style={{ color: 'var(--text-muted)' }} strokeWidth={2} />
 										</button>
@@ -772,10 +770,10 @@ export function TorrentList() {
 								</div>
 								<div>
 									<h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-										Delete
+										{t('torrentList.delete')}
 									</h3>
 									<p className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-										{selected.size} torrent{selected.size > 1 ? 's' : ''}
+										{t('torrentList.torrentCount', { count: selected.size })}
 									</p>
 								</div>
 							</div>
@@ -790,14 +788,14 @@ export function TorrentList() {
 										color: 'var(--error)',
 									}}
 								>
-									Remove from list
+									{t('torrentList.removeFromList')}
 								</button>
 								<button
 									onClick={() => handleDelete(true)}
 									className="w-full py-2.5 rounded-lg text-xs font-medium transition-colors text-white"
 									style={{ backgroundColor: 'var(--error)' }}
 								>
-									Delete with files
+									{t('torrentList.deleteWithFiles')}
 								</button>
 								<button
 									onClick={() => setDeleteModal(false)}
@@ -808,7 +806,7 @@ export function TorrentList() {
 										color: 'var(--text-muted)',
 									}}
 								>
-									Cancel
+									{t('common.cancel')}
 								</button>
 							</div>
 						</div>

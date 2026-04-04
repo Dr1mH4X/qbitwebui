@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { FileText } from 'lucide-react'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Toggle, Select, Checkbox } from '../ui'
@@ -7,39 +8,41 @@ interface Props {
 	onChange: (updates: Partial<QBittorrentPreferences>) => void
 }
 
-const LOCALES = [
-	{ value: 'en', label: 'English' },
-	{ value: 'en_AU', label: 'English (Australia)' },
-	{ value: 'en_GB', label: 'English (United Kingdom)' },
-	{ value: 'de', label: 'Deutsch' },
-	{ value: 'es', label: 'Español' },
-	{ value: 'fr', label: 'Français' },
-	{ value: 'it', label: 'Italiano' },
-	{ value: 'ja', label: '日本語' },
-	{ value: 'ko', label: '한국어' },
-	{ value: 'nl', label: 'Nederlands' },
-	{ value: 'pl', label: 'Polski' },
-	{ value: 'pt_BR', label: 'Português (Brasil)' },
-	{ value: 'pt_PT', label: 'Português (Portugal)' },
-	{ value: 'ru', label: 'Русский' },
-	{ value: 'tr', label: 'Türkçe' },
-	{ value: 'uk', label: 'Українська' },
-	{ value: 'zh', label: '中文 (简体)' },
-	{ value: 'zh_TW', label: '中文 (繁體)' },
-]
-
-const FILE_LOG_AGE_TYPES = [
-	{ value: 0, label: 'Days' },
-	{ value: 1, label: 'Months' },
-	{ value: 2, label: 'Years' },
-]
-
 export function BehaviorTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
+
+	const LOCALES = [
+		{ value: 'en', label: t('locales.en') },
+		{ value: 'en_AU', label: t('locales.en-AU') },
+		{ value: 'en_GB', label: t('locales.en-GB') },
+		{ value: 'de', label: t('locales.de') },
+		{ value: 'es', label: t('locales.es') },
+		{ value: 'fr', label: t('locales.fr') },
+		{ value: 'it', label: t('locales.it') },
+		{ value: 'ja', label: t('locales.ja') },
+		{ value: 'ko', label: t('locales.ko') },
+		{ value: 'nl', label: t('locales.nl') },
+		{ value: 'pl', label: t('locales.pl') },
+		{ value: 'pt_BR', label: t('locales.ptBR') },
+		{ value: 'pt_PT', label: t('locales.ptPT') },
+		{ value: 'ru', label: t('locales.ru') },
+		{ value: 'tr', label: t('locales.tr') },
+		{ value: 'uk', label: t('locales.uk') },
+		{ value: 'zh', label: t('locales.zh') },
+		{ value: 'zh_TW', label: t('locales.zhTW') },
+	]
+
+	const FILE_LOG_AGE_TYPES = [
+		{ value: 0, label: t('settingsBehavior.days') },
+		{ value: 1, label: t('settingsBehavior.months') },
+		{ value: 2, label: t('settingsBehavior.years') },
+	]
+
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center gap-3">
 				<label className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-					Language
+					{t('settingsBehavior.language')}
 				</label>
 				<Select
 					value={preferences.locale ?? 'en'}
@@ -53,10 +56,10 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Transfer List
+					{t('settingsBehavior.transferList')}
 				</div>
 				<Checkbox
-					label="Confirm when deleting torrents"
+					label={t('settingsBehavior.confirmDelete')}
 					checked={preferences.confirm_torrent_deletion ?? true}
 					onChange={(v) => onChange({ confirm_torrent_deletion: v })}
 				/>
@@ -66,12 +69,12 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Interface
+					{t('settingsBehavior.interface')}
 				</div>
 				<div className="grid grid-cols-2 gap-x-4 gap-y-1">
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Show external IP in status bar
+							{t('settingsBehavior.showExternalIp')}
 						</span>
 						<Toggle
 							checked={preferences.status_bar_external_ip ?? false}
@@ -80,7 +83,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 					</div>
 					<div className="flex items-center justify-between">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Performance warning
+							{t('settingsBehavior.performanceWarning')}
 						</span>
 						<Toggle
 							checked={preferences.performance_warning ?? true}
@@ -101,7 +104,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 							strokeWidth={1.5}
 						/>
 						<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							File Log
+							{t('settingsBehavior.fileLog')}
 						</span>
 					</div>
 					<Toggle checked={preferences.file_log_enabled ?? false} onChange={(v) => onChange({ file_log_enabled: v })} />
@@ -111,7 +114,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 					<div className="space-y-2 pl-6">
 						<div>
 							<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-								Log path
+								{t('settingsBehavior.logPath')}
 							</label>
 							<input
 								type="text"
@@ -128,7 +131,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-3 gap-2">
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Max size (KiB)
+									{t('settingsBehavior.maxSize')}
 								</label>
 								<input
 									type="number"
@@ -144,7 +147,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 							</div>
 							<div>
 								<label className="block text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
-									Delete after
+									{t('settingsBehavior.deleteAfter')}
 								</label>
 								<input
 									type="number"
@@ -172,7 +175,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 						<div className="grid grid-cols-2 gap-x-4 gap-y-1">
 							<div className="flex items-center justify-between">
 								<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Backup log file
+									{t('settingsBehavior.backupLogFile')}
 								</span>
 								<Toggle
 									checked={preferences.file_log_backup_enabled ?? true}
@@ -181,7 +184,7 @@ export function BehaviorTab({ preferences, onChange }: Props) {
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Delete old logs
+									{t('settingsBehavior.deleteOldLogs')}
 								</span>
 								<Toggle
 									checked={preferences.file_log_delete_old ?? true}

@@ -1,19 +1,7 @@
+import { useTranslation } from 'react-i18next'
 import { ArrowDown, ArrowUp, Clock } from 'lucide-react'
 import type { QBittorrentPreferences } from '../../types/preferences'
 import { Toggle, Checkbox, Select } from '../ui'
-
-const SCHEDULER_DAYS = [
-	{ value: 0, label: 'Every day' },
-	{ value: 1, label: 'Weekdays' },
-	{ value: 2, label: 'Weekend' },
-	{ value: 3, label: 'Monday' },
-	{ value: 4, label: 'Tuesday' },
-	{ value: 5, label: 'Wednesday' },
-	{ value: 6, label: 'Thursday' },
-	{ value: 7, label: 'Friday' },
-	{ value: 8, label: 'Saturday' },
-	{ value: 9, label: 'Sunday' },
-]
 
 interface Props {
 	preferences: Partial<QBittorrentPreferences>
@@ -31,11 +19,26 @@ function kbToBytes(kb: string): number {
 }
 
 export function SpeedTab({ preferences, onChange }: Props) {
+	const { t } = useTranslation()
+
+	const SCHEDULER_DAYS = [
+		{ value: 0, label: t('settingsSpeed.everyDay') },
+		{ value: 1, label: t('settingsSpeed.weekdays') },
+		{ value: 2, label: t('settingsSpeed.weekend') },
+		{ value: 3, label: t('settingsSpeed.monday') },
+		{ value: 4, label: t('settingsSpeed.tuesday') },
+		{ value: 5, label: t('settingsSpeed.wednesday') },
+		{ value: 6, label: t('settingsSpeed.thursday') },
+		{ value: 7, label: t('settingsSpeed.friday') },
+		{ value: 8, label: t('settingsSpeed.saturday') },
+		{ value: 9, label: t('settingsSpeed.sunday') },
+	]
+
 	return (
 		<div className="space-y-4">
 			<div className="flex justify-end">
 				<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-					0 = unlimited
+					{t('settingsSpeed.unlimited')}
 				</span>
 			</div>
 
@@ -45,7 +48,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 						className="text-[10px] font-semibold uppercase tracking-wider mb-2"
 						style={{ color: 'var(--text-muted)' }}
 					>
-						Global Limits
+						{t('settingsSpeed.globalLimits')}
 					</div>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
@@ -63,7 +66,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								KiB/s
+								{t('settingsSpeed.kbs')}
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
@@ -81,7 +84,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								KiB/s
+								{t('settingsSpeed.kbs')}
 							</span>
 						</div>
 					</div>
@@ -92,7 +95,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 						className="text-[10px] font-semibold uppercase tracking-wider mb-2"
 						style={{ color: 'var(--text-muted)' }}
 					>
-						Alternative Limits
+						{t('settingsSpeed.alternativeLimits')}
 					</div>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
@@ -110,7 +113,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								KiB/s
+								{t('settingsSpeed.kbs')}
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
@@ -128,7 +131,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 								}}
 							/>
 							<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-								KiB/s
+								{t('settingsSpeed.kbs')}
 							</span>
 						</div>
 					</div>
@@ -146,7 +149,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 							strokeWidth={1.5}
 						/>
 						<span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Schedule alternative limits
+							{t('settingsSpeed.scheduleAlternative')}
 						</span>
 					</div>
 					<Toggle
@@ -159,7 +162,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 					<div className="flex items-center gap-4 pl-5">
 						<div className="flex items-center gap-1">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								From
+								{t('settingsSpeed.from')}
 							</span>
 							<Select
 								value={preferences.schedule_from_hour ?? 8}
@@ -177,7 +180,7 @@ export function SpeedTab({ preferences, onChange }: Props) {
 						</div>
 						<div className="flex items-center gap-1">
 							<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								To
+								{t('settingsSpeed.to')}
 							</span>
 							<Select
 								value={preferences.schedule_to_hour ?? 20}
@@ -207,23 +210,23 @@ export function SpeedTab({ preferences, onChange }: Props) {
 
 			<div>
 				<div className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-					Rate Limit Settings
+					{t('settingsSpeed.rateLimitSettings')}
 				</div>
 				<div className="grid grid-cols-2 gap-2">
 					<Checkbox
 						checked={preferences.limit_utp_rate ?? true}
 						onChange={(v) => onChange({ limit_utp_rate: v })}
-						label="Apply to µTP protocol"
+						label={t('settingsSpeed.applyToUtp')}
 					/>
 					<Checkbox
 						checked={preferences.limit_tcp_overhead ?? false}
 						onChange={(v) => onChange({ limit_tcp_overhead: v })}
-						label="Apply to transport overhead"
+						label={t('settingsSpeed.applyToOverhead')}
 					/>
 					<Checkbox
 						checked={preferences.limit_lan_peers ?? true}
 						onChange={(v) => onChange({ limit_lan_peers: v })}
-						label="Apply to LAN peers"
+						label={t('settingsSpeed.applyToLan')}
 					/>
 				</div>
 			</div>

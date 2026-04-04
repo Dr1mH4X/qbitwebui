@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, type FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	LayoutGrid,
 	Download,
@@ -20,21 +21,21 @@ import type { Category } from '../api/qbittorrent'
 import type { ColumnDef } from './columns'
 import { useClickOutside } from '../hooks/useClickOutside'
 
-const filters: { value: TorrentFilter; label: string; Icon: FC<{ className?: string; strokeWidth?: number }> }[] = [
-	{ value: 'all', label: 'All', Icon: LayoutGrid },
-	{ value: 'downloading', label: 'Downloading', Icon: Download },
-	{ value: 'seeding', label: 'Seeding', Icon: Upload },
-	{ value: 'completed', label: 'Completed', Icon: CheckCircle },
-	{ value: 'stopped', label: 'Stopped', Icon: Square },
-	{ value: 'active', label: 'Active', Icon: Zap },
-]
-
 interface Props {
 	filter: TorrentFilter
 	onFilterChange: (f: TorrentFilter) => void
 }
 
 export function FilterBar({ filter, onFilterChange }: Props) {
+	const { t } = useTranslation()
+	const filters: { value: TorrentFilter; label: string; Icon: FC<{ className?: string; strokeWidth?: number }> }[] = [
+		{ value: 'all', label: t('filters.all'), Icon: LayoutGrid },
+		{ value: 'downloading', label: t('filters.downloading'), Icon: Download },
+		{ value: 'seeding', label: t('filters.seeding'), Icon: Upload },
+		{ value: 'completed', label: t('filters.completed'), Icon: CheckCircle },
+		{ value: 'stopped', label: t('filters.stopped'), Icon: Square },
+		{ value: 'active', label: t('filters.active'), Icon: Zap },
+	]
 	return (
 		<>
 			{filters.map((f) => (
@@ -57,6 +58,7 @@ export function FilterBar({ filter, onFilterChange }: Props) {
 }
 
 export function SearchInput({ value, onChange }: { value: string; onChange: (s: string) => void }) {
+	const { t } = useTranslation()
 	return (
 		<div className="relative flex-1 min-w-[120px] max-w-[280px]">
 			<Search
@@ -66,7 +68,7 @@ export function SearchInput({ value, onChange }: { value: string; onChange: (s: 
 			/>
 			<input
 				type="text"
-				placeholder="Search..."
+				placeholder={t('filters.searchPlaceholder')}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				className="w-full h-7 pl-8 pr-3 rounded text-xs transition-all duration-150"
@@ -85,6 +87,7 @@ interface DropdownProps<T extends string> {
 }
 
 function Dropdown<T extends string>({ value, onChange, options, placeholder, Icon }: DropdownProps<T>) {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 	const close = useCallback(() => setOpen(false), [])
@@ -122,7 +125,7 @@ function Dropdown<T extends string>({ value, onChange, options, placeholder, Ico
 							backgroundColor: !value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
 						}}
 					>
-						All {placeholder}s
+						{t('filters.all')} {placeholder}s
 					</button>
 					{options.map((o) => (
 						<button
@@ -159,6 +162,7 @@ interface CategoryDropdownProps {
 }
 
 export function CategoryDropdown({ value, onChange, categories }: CategoryDropdownProps) {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 	const close = useCallback(() => setOpen(false), [])
@@ -171,7 +175,7 @@ export function CategoryDropdown({ value, onChange, categories }: CategoryDropdo
 		<div ref={ref} className="relative">
 			<button
 				onClick={() => setOpen(!open)}
-				title={selected ?? 'Category'}
+				title={selected ?? t('filters.category')}
 				className="flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-150"
 				style={{
 					color: value ? 'var(--accent)' : 'var(--text-muted)',
@@ -179,7 +183,7 @@ export function CategoryDropdown({ value, onChange, categories }: CategoryDropdo
 				}}
 			>
 				<Folder className="w-3.5 h-3.5" strokeWidth={2} />
-				<span className="text-xs font-medium max-w-[60px] truncate">{selected ?? 'Category'}</span>
+				<span className="text-xs font-medium max-w-[60px] truncate">{selected ?? t('filters.category')}</span>
 			</button>
 			{open && (
 				<div
@@ -197,7 +201,7 @@ export function CategoryDropdown({ value, onChange, categories }: CategoryDropdo
 							backgroundColor: !value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
 						}}
 					>
-						All Categories
+						{t('filters.allCategories')}
 					</button>
 					{names.map((name) => (
 						<button
@@ -228,6 +232,7 @@ interface TagDropdownProps {
 }
 
 export function TagDropdown({ value, onChange, tags }: TagDropdownProps) {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 	const close = useCallback(() => setOpen(false), [])
@@ -239,7 +244,7 @@ export function TagDropdown({ value, onChange, tags }: TagDropdownProps) {
 		<div ref={ref} className="relative">
 			<button
 				onClick={() => setOpen(!open)}
-				title={selected ?? 'Tag'}
+				title={selected ?? t('filters.tag')}
 				className="flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-150"
 				style={{
 					color: value ? 'var(--accent)' : 'var(--text-muted)',
@@ -247,7 +252,7 @@ export function TagDropdown({ value, onChange, tags }: TagDropdownProps) {
 				}}
 			>
 				<Tag className="w-3.5 h-3.5" strokeWidth={2} />
-				<span className="text-xs font-medium max-w-[60px] truncate">{selected ?? 'Tag'}</span>
+				<span className="text-xs font-medium max-w-[60px] truncate">{selected ?? t('filters.tag')}</span>
 			</button>
 			{open && (
 				<div
@@ -265,7 +270,7 @@ export function TagDropdown({ value, onChange, tags }: TagDropdownProps) {
 							backgroundColor: !value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
 						}}
 					>
-						All Tags
+						{t('filters.allTags')}
 					</button>
 					{tags.map((tag) => (
 						<button
@@ -290,15 +295,16 @@ export function TagDropdown({ value, onChange, tags }: TagDropdownProps) {
 }
 
 export function ManageButton({ onClick }: { onClick: () => void }) {
+	const { t } = useTranslation()
 	return (
 		<button
 			onClick={onClick}
 			className="flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-150 hover:opacity-80"
 			style={{ color: 'var(--text-muted)' }}
-			title="Manage categories & tags"
+			title={t('filters.manageCategoriesAndTags')}
 		>
 			<Settings className="w-3.5 h-3.5" strokeWidth={2} />
-			<span className="text-xs font-medium">Manage</span>
+			<span className="text-xs font-medium">{t('common.manage')}</span>
 		</button>
 	)
 }
@@ -310,15 +316,18 @@ interface TrackerDropdownProps {
 }
 
 export function TrackerDropdown({ value, onChange, trackers }: TrackerDropdownProps) {
-	const options = trackers.map((t) => {
+	const { t } = useTranslation()
+	const options = trackers.map((tracker) => {
 		try {
-			const url = new URL(t)
-			return { value: t, label: url.hostname }
+			const url = new URL(tracker)
+			return { value: tracker, label: url.hostname }
 		} catch {
-			return { value: t, label: t }
+			return { value: tracker, label: tracker }
 		}
 	})
-	return <Dropdown value={value} onChange={onChange} options={options} placeholder="Tracker" Icon={Repeat} />
+	return (
+		<Dropdown value={value} onChange={onChange} options={options} placeholder={t('filters.tracker')} Icon={Repeat} />
+	)
 }
 
 interface ColumnSelectorProps {
@@ -331,6 +340,7 @@ interface ColumnSelectorProps {
 }
 
 export function ColumnSelector({ columns, visible, onChange, columnOrder, onReorder, onReset }: ColumnSelectorProps) {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const [draggedId, setDraggedId] = useState<string | null>(null)
 	const ref = useRef<HTMLDivElement>(null)
@@ -375,10 +385,10 @@ export function ColumnSelector({ columns, visible, onChange, columnOrder, onReor
 				onClick={() => setOpen(!open)}
 				className="flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-150"
 				style={{ color: 'var(--text-muted)' }}
-				title="Configure columns"
+				title={t('filters.configureColumns')}
 			>
 				<Columns3 className="w-3.5 h-3.5" strokeWidth={2} />
-				<span className="text-xs font-medium">Columns</span>
+				<span className="text-xs font-medium">{t('filters.columns')}</span>
 			</button>
 			{open && (
 				<div
@@ -390,7 +400,7 @@ export function ColumnSelector({ columns, visible, onChange, columnOrder, onReor
 						style={{ borderColor: 'var(--border)' }}
 					>
 						<span className="text-xs uppercase tracking-widest font-medium" style={{ color: 'var(--text-muted)' }}>
-							Columns
+							{t('filters.columns')}
 						</span>
 						<button
 							onClick={() => {
@@ -400,7 +410,7 @@ export function ColumnSelector({ columns, visible, onChange, columnOrder, onReor
 							className="text-xs transition-colors hover:opacity-80"
 							style={{ color: 'var(--accent)' }}
 						>
-							Reset
+							{t('common.reset')}
 						</button>
 					</div>
 					{orderedColumns.map((col) => (

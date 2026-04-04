@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Loader2, Server, FileText } from 'lucide-react'
 import { type Instance } from '../api/instances'
 import { getLog, getPeerLog, type LogEntry, type PeerLogEntry } from '../api/qbittorrent'
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function LogViewer({ instances }: Props) {
+	const { t } = useTranslation()
 	const [selectedInstance, setSelectedInstance] = useState<number>(instances[0]?.id ?? 0)
 	const [tab, setTab] = useState<LogTab>('main')
 	const [mainLogs, setMainLogs] = useState<LogEntry[]>([])
@@ -103,8 +105,8 @@ export function LogViewer({ instances }: Props) {
 	const instanceOptions = useMemo(() => instances.map((i) => ({ value: i.id, label: i.label })), [instances])
 
 	const sortOptions: { value: SortOrder; label: string }[] = [
-		{ value: 'newest', label: 'Newest first' },
-		{ value: 'oldest', label: 'Oldest first' },
+		{ value: 'newest', label: t('logViewer.newestFirst') },
+		{ value: 'oldest', label: t('logViewer.oldestFirst') },
 	]
 
 	function formatTime(ts: number) {
@@ -122,10 +124,10 @@ export function LogViewer({ instances }: Props) {
 			<div className="flex items-center justify-between mb-6">
 				<div>
 					<h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-						Log Viewer
+						{t('logViewer.title')}
 					</h1>
 					<p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-						View qBittorrent application and peer logs
+						{t('logViewer.description')}
 					</p>
 				</div>
 				<button
@@ -137,10 +139,10 @@ export function LogViewer({ instances }: Props) {
 					{loading ? (
 						<span className="flex items-center gap-2">
 							<Loader2 className="w-4 h-4 animate-spin" />
-							Loading
+							{t('logViewer.loading')}
 						</span>
 					) : (
-						'Refresh'
+						t('common.refresh')
 					)}
 				</button>
 			</div>
@@ -152,7 +154,7 @@ export function LogViewer({ instances }: Props) {
 				<div className="flex flex-wrap items-center gap-4">
 					<div className="flex items-center gap-2">
 						<label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Instance
+							{t('logViewer.instance')}
 						</label>
 						<Select
 							value={selectedInstance}
@@ -164,7 +166,7 @@ export function LogViewer({ instances }: Props) {
 
 					<div className="flex items-center gap-2">
 						<label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Sort
+							{t('logViewer.sort')}
 						</label>
 						<Select value={sortOrder} options={sortOptions} onChange={setSortOrder} minWidth="130px" />
 					</div>
@@ -173,18 +175,18 @@ export function LogViewer({ instances }: Props) {
 						className="flex items-center gap-1 p-1 rounded-lg ml-auto"
 						style={{ backgroundColor: 'var(--bg-tertiary)' }}
 					>
-						{(['main', 'peers'] as const).map((t) => (
+						{(['main', 'peers'] as const).map((tabKey) => (
 							<button
-								key={t}
-								onClick={() => setTab(t)}
+								key={tabKey}
+								onClick={() => setTab(tabKey)}
 								className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
 								style={{
-									backgroundColor: tab === t ? 'var(--bg-secondary)' : 'transparent',
-									color: tab === t ? 'var(--text-primary)' : 'var(--text-muted)',
-									boxShadow: tab === t ? '0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border)' : 'none',
+									backgroundColor: tab === tabKey ? 'var(--bg-secondary)' : 'transparent',
+									color: tab === tabKey ? 'var(--text-primary)' : 'var(--text-muted)',
+									boxShadow: tab === tabKey ? '0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border)' : 'none',
 								}}
 							>
-								{t === 'main' ? 'Application' : 'Peers'}
+								{tabKey === 'main' ? t('logViewer.application') : t('logViewer.peers')}
 							</button>
 						))}
 					</div>
@@ -200,7 +202,7 @@ export function LogViewer({ instances }: Props) {
 								className="text-xs font-medium uppercase tracking-wider mr-1"
 								style={{ color: 'var(--text-muted)' }}
 							>
-								Types
+								{t('logViewer.types')}
 							</span>
 							{Object.entries(LOG_TYPES).map(([type, { label, color, bg }]) => {
 								const key = label.toLowerCase() as keyof typeof filters
@@ -227,7 +229,7 @@ export function LogViewer({ instances }: Props) {
 									className="text-xs underline ml-1"
 									style={{ color: 'var(--text-muted)' }}
 								>
-									Reset
+									{t('common.reset')}
 								</button>
 							)}
 						</div>
@@ -235,7 +237,7 @@ export function LogViewer({ instances }: Props) {
 
 					<label className="flex items-center gap-2 cursor-pointer select-none ml-auto">
 						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Auto-refresh
+							{t('logViewer.autoRefresh')}
 						</span>
 						<div
 							className="w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer"
@@ -261,10 +263,10 @@ export function LogViewer({ instances }: Props) {
 				>
 					<Server className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} strokeWidth={1} />
 					<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-						No instances configured
+						{t('logViewer.noInstances')}
 					</p>
 					<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-						Add an instance to view logs
+						{t('logViewer.addInstance')}
 					</p>
 				</div>
 			) : logCount === 0 && !loading ? (
@@ -274,10 +276,10 @@ export function LogViewer({ instances }: Props) {
 				>
 					<FileText className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} strokeWidth={1} />
 					<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-						No log entries
+						{t('logViewer.noEntries')}
 					</p>
 					<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-						{tab === 'main' && activeFilterCount < 4 ? 'Try adjusting your filters' : 'Logs will appear here'}
+						{tab === 'main' && activeFilterCount < 4 ? t('logViewer.tryAdjusting') : t('logViewer.logsWillAppear')}
 					</p>
 				</div>
 			) : (
@@ -294,29 +296,29 @@ export function LogViewer({ instances }: Props) {
 										className="text-left px-4 py-2.5 font-medium whitespace-nowrap"
 										style={{ color: 'var(--text-muted)', width: '150px' }}
 									>
-										Timestamp
+										{t('logViewer.timestamp')}
 									</th>
 									{tab === 'main' ? (
 										<th
 											className="text-left px-4 py-2.5 font-medium"
 											style={{ color: 'var(--text-muted)', width: '90px' }}
 										>
-											Level
+											{t('logViewer.level')}
 										</th>
 									) : (
 										<th
 											className="text-left px-4 py-2.5 font-medium"
 											style={{ color: 'var(--text-muted)', width: '90px' }}
 										>
-											Status
+											{t('logViewer.status')}
 										</th>
 									)}
 									<th className="text-left px-4 py-2.5 font-medium" style={{ color: 'var(--text-muted)' }}>
-										{tab === 'main' ? 'Message' : 'IP Address'}
+										{tab === 'main' ? t('logViewer.message') : t('logViewer.ipAddress')}
 									</th>
 									{tab === 'peers' && (
 										<th className="text-left px-4 py-2.5 font-medium" style={{ color: 'var(--text-muted)' }}>
-											Reason
+											{t('logViewer.reason')}
 										</th>
 									)}
 								</tr>
@@ -370,7 +372,7 @@ export function LogViewer({ instances }: Props) {
 															color: entry.blocked ? 'var(--error)' : 'var(--accent)',
 														}}
 													>
-														{entry.blocked ? 'Blocked' : 'Connected'}
+														{entry.blocked ? t('logViewer.blocked') : t('logViewer.connected')}
 													</span>
 												</td>
 												<td className="px-4 py-2" style={{ color: 'var(--text-primary)' }}>
@@ -388,11 +390,14 @@ export function LogViewer({ instances }: Props) {
 						className="px-4 py-2 text-xs border-t flex items-center justify-between"
 						style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 					>
-						<span>{logCount} entries</span>
+						<span>
+							{logCount}
+							{t('logViewer.entries')}
+						</span>
 						{autoRefresh && (
 							<span className="flex items-center gap-1.5">
 								<span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
-								Live
+								{t('logViewer.live')}
 							</span>
 						)}
 					</div>

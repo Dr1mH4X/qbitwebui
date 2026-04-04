@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	Globe,
 	Gauge,
@@ -48,7 +49,17 @@ function formatBandwidth(bps: number): string {
 	return mbps.toFixed(1)
 }
 
-function RunButton({ onClick, disabled, loading }: { onClick: () => void; disabled: boolean; loading: boolean }) {
+function RunButton({
+	onClick,
+	disabled,
+	loading,
+	t,
+}: {
+	onClick: () => void
+	disabled: boolean
+	loading: boolean
+	t: (key: string) => string
+}) {
 	return (
 		<button
 			onClick={onClick}
@@ -56,12 +67,13 @@ function RunButton({ onClick, disabled, loading }: { onClick: () => void; disabl
 			className="w-12 h-7 rounded text-xs font-medium transition-all disabled:opacity-40 flex items-center justify-center"
 			style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 		>
-			{loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Run'}
+			{loading ? <Loader2 className="w-3 h-3 animate-spin" /> : t('networkTools.run')}
 		</button>
 	)
 }
 
 export function NetworkTools({ instances }: Props) {
+	const { t } = useTranslation()
 	const agentInstances = instances.filter((i) => i.agent_enabled)
 	const [selectedInstance, setSelectedInstance] = useState<Instance | null>(agentInstances[0] || null)
 	const [agentOnline, setAgentOnline] = useState<boolean | null>(null)
@@ -185,10 +197,10 @@ export function NetworkTools({ instances }: Props) {
 					<Network className="w-8 h-8" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
 				</div>
 				<h2 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-					No Agent Configured
+					{t('networkTools.noAgent')}
 				</h2>
 				<p className="text-sm mb-6 text-center max-w-md" style={{ color: 'var(--text-muted)' }}>
-					Enable net-agent on an instance to run network diagnostics from your qBittorrent host
+					{t('networkTools.enableAgent')}
 				</p>
 				<a
 					href="https://maciejonos.github.io/qbitwebui/guide/network-agent/"
@@ -197,7 +209,7 @@ export function NetworkTools({ instances }: Props) {
 					className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
 					style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 				>
-					Setup Guide
+					{t('networkTools.setupGuide')}
 				</a>
 			</div>
 		)
@@ -205,7 +217,7 @@ export function NetworkTools({ instances }: Props) {
 
 	const canRun = selectedInstance && agentOnline
 	const serverOptions = [
-		{ value: 0, label: loadingServers ? 'Loading...' : 'Auto (nearest)' },
+		{ value: 0, label: loadingServers ? t('common.loading') : t('networkTools.autoNearest') },
 		...speedtestServers.map((s) => ({ value: s.id, label: `${s.name} - ${s.location}` })),
 	]
 
@@ -214,10 +226,10 @@ export function NetworkTools({ instances }: Props) {
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-						Network Diagnostics
+						{t('networkTools.title')}
 					</h1>
 					<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-						Run tests from your qBittorrent instance's network
+						{t('networkTools.description')}
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
@@ -231,7 +243,7 @@ export function NetworkTools({ instances }: Props) {
 								style={{ backgroundColor: agentOnline ? '#a6e3a1' : 'var(--error)' }}
 							/>
 							<span className="text-xs" style={{ color: agentOnline ? '#a6e3a1' : 'var(--error)' }}>
-								{agentOnline ? 'Agent Online' : 'Agent Offline'}
+								{agentOnline ? t('networkTools.agentOnline') : t('networkTools.agentOffline')}
 							</span>
 						</div>
 					)}
@@ -260,9 +272,7 @@ export function NetworkTools({ instances }: Props) {
 					}}
 				>
 					<Activity className="w-4 h-4 shrink-0" style={{ color: 'var(--error)' }} />
-					<span style={{ color: 'var(--error)' }}>
-						Agent not reachable at port 9876. Ensure net-agent is running on the qBittorrent host.
-					</span>
+					<span style={{ color: 'var(--error)' }}>{t('networkTools.agentNotReachable')}</span>
 				</div>
 			)}
 
@@ -278,15 +288,15 @@ export function NetworkTools({ instances }: Props) {
 						<div className="flex items-center gap-2.5">
 							<Globe className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 							<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-								External IP
+								{t('networkTools.externalIp')}
 							</span>
 						</div>
-						<RunButton onClick={handleRunIpInfo} disabled={!canRun} loading={ipInfo.status === 'loading'} />
+						<RunButton onClick={handleRunIpInfo} disabled={!canRun} loading={ipInfo.status === 'loading'} t={t} />
 					</div>
 					<div className="p-4 min-h-[140px] rounded-b-xl flex-1" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 						{!ipInfo.data && ipInfo.status !== 'error' && (
 							<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Click Run to fetch IP information
+								{t('networkTools.clickRunIp')}
 							</p>
 						)}
 						{ipInfo.status === 'error' && !ipInfo.data && (
@@ -329,15 +339,15 @@ export function NetworkTools({ instances }: Props) {
 						<div className="flex items-center gap-2.5">
 							<Server className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 							<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-								DNS
+								{t('networkTools.dns')}
 							</span>
 						</div>
-						<RunButton onClick={handleRunDns} disabled={!canRun} loading={dns.status === 'loading'} />
+						<RunButton onClick={handleRunDns} disabled={!canRun} loading={dns.status === 'loading'} t={t} />
 					</div>
 					<div className="p-4 min-h-[140px] rounded-b-xl flex-1" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 						{!dns.data && dns.status !== 'error' && (
 							<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Click Run to show DNS servers
+								{t('networkTools.clickRunDns')}
 							</p>
 						)}
 						{dns.status === 'error' && !dns.data && (
@@ -361,7 +371,7 @@ export function NetworkTools({ instances }: Props) {
 								))}
 								{dns.data.servers.length === 0 && (
 									<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-										No DNS servers found
+										{t('networkTools.noDnsServers')}
 									</p>
 								)}
 							</div>
@@ -380,15 +390,15 @@ export function NetworkTools({ instances }: Props) {
 						<div className="flex items-center gap-2.5">
 							<Network className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 							<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-								Interfaces
+								{t('networkTools.interfaces')}
 							</span>
 						</div>
-						<RunButton onClick={handleRunInterfaces} disabled={!canRun} loading={ifaces.status === 'loading'} />
+						<RunButton onClick={handleRunInterfaces} disabled={!canRun} loading={ifaces.status === 'loading'} t={t} />
 					</div>
 					<div className="p-4 min-h-[140px] rounded-b-xl flex-1" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 						{!ifaces.data && ifaces.status !== 'error' && (
 							<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-								Click Run to list network interfaces
+								{t('networkTools.clickRunInterfaces')}
 							</p>
 						)}
 						{ifaces.status === 'error' && !ifaces.data && (
@@ -434,13 +444,13 @@ export function NetworkTools({ instances }: Props) {
 					<div className="flex items-center gap-2.5">
 						<Gauge className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 						<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-							Speedtest
+							{t('networkTools.speedtest')}
 						</span>
 						<span
 							className="text-xs px-1.5 py-0.5 rounded"
 							style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}
 						>
-							Ookla
+							{t('networkTools.ookla')}
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
@@ -450,13 +460,13 @@ export function NetworkTools({ instances }: Props) {
 							onChange={(v) => setSelectedServer(v || null)}
 							minWidth="180px"
 						/>
-						<RunButton onClick={handleRunSpeedtest} disabled={!canRun} loading={speedtest.status === 'loading'} />
+						<RunButton onClick={handleRunSpeedtest} disabled={!canRun} loading={speedtest.status === 'loading'} t={t} />
 					</div>
 				</div>
 				<div className="p-4 min-h-[140px] rounded-b-xl" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
 					{speedtest.status === 'idle' && (
 						<p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-							Select a server or use auto-detection, then click Run
+							{t('networkTools.selectServer')}
 						</p>
 					)}
 					{speedtest.status === 'loading' && (
@@ -485,10 +495,10 @@ export function NetworkTools({ instances }: Props) {
 							</div>
 							<div>
 								<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-									Running speedtest...
+									{t('networkTools.runningSpeedtest')}
 								</p>
 								<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-									This typically takes 30-60 seconds
+									{t('networkTools.speedtestTakesTime')}
 								</p>
 							</div>
 						</div>
@@ -504,7 +514,7 @@ export function NetworkTools({ instances }: Props) {
 								<div className="flex items-center gap-2 mb-2">
 									<ArrowDown className="w-4 h-4" style={{ color: 'var(--accent)' }} />
 									<span className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-										Download
+										{t('networkTools.download')}
 									</span>
 								</div>
 								<div className="flex items-baseline gap-1">
@@ -512,7 +522,7 @@ export function NetworkTools({ instances }: Props) {
 										{formatBandwidth(speedtest.data.download.bandwidth)}
 									</span>
 									<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-										Mbps
+										{t('networkTools.mbps')}
 									</span>
 								</div>
 							</div>
@@ -520,7 +530,7 @@ export function NetworkTools({ instances }: Props) {
 								<div className="flex items-center gap-2 mb-2">
 									<ArrowUp className="w-4 h-4" style={{ color: '#a6e3a1' }} />
 									<span className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-										Upload
+										{t('networkTools.upload')}
 									</span>
 								</div>
 								<div className="flex items-baseline gap-1">
@@ -528,7 +538,7 @@ export function NetworkTools({ instances }: Props) {
 										{formatBandwidth(speedtest.data.upload.bandwidth)}
 									</span>
 									<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-										Mbps
+										{t('networkTools.mbps')}
 									</span>
 								</div>
 							</div>
@@ -536,7 +546,7 @@ export function NetworkTools({ instances }: Props) {
 								<div className="flex items-center gap-2 mb-2">
 									<Activity className="w-4 h-4" style={{ color: 'var(--warning)' }} />
 									<span className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-										Ping
+										{t('networkTools.ping')}
 									</span>
 								</div>
 								<div className="flex items-baseline gap-1">
@@ -544,7 +554,7 @@ export function NetworkTools({ instances }: Props) {
 										{speedtest.data.ping.latency.toFixed(0)}
 									</span>
 									<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-										ms
+										{t('networkTools.ms')}
 									</span>
 								</div>
 							</div>
@@ -552,7 +562,7 @@ export function NetworkTools({ instances }: Props) {
 								<div className="flex items-center gap-2 mb-2">
 									<Server className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
 									<span className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-										Server
+										{t('networkTools.server')}
 									</span>
 								</div>
 								<div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
@@ -575,7 +585,7 @@ export function NetworkTools({ instances }: Props) {
 					<div className="flex items-center gap-2.5">
 						<Terminal className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 						<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-							Terminal
+							{t('networkTools.terminal')}
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
@@ -631,7 +641,11 @@ export function NetworkTools({ instances }: Props) {
 							className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-40 flex items-center gap-2"
 							style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 						>
-							{commandResult.status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Execute'}
+							{commandResult.status === 'loading' ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								t('networkTools.execute')
+							)}
 						</button>
 					</form>
 					<div
@@ -639,25 +653,24 @@ export function NetworkTools({ instances }: Props) {
 						style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border)' }}
 					>
 						{commandResult.status === 'idle' && (
-							<span style={{ color: 'var(--text-muted)' }}>
-								Allowed commands: ping, dig, nslookup, traceroute, curl, wget
-							</span>
+							<span style={{ color: 'var(--text-muted)' }}>{t('networkTools.allowedCommands')}</span>
 						)}
 						{commandResult.status === 'loading' && (
 							<div className="flex items-center gap-2">
 								<Loader2 className="w-3 h-3 animate-spin" style={{ color: 'var(--accent)' }} />
-								<span style={{ color: 'var(--text-muted)' }}>Executing...</span>
+								<span style={{ color: 'var(--text-muted)' }}>{t('networkTools.executing')}</span>
 							</div>
 						)}
 						{commandResult.status === 'error' && <span style={{ color: 'var(--error)' }}>{commandResult.error}</span>}
 						{commandResult.status === 'success' && commandResult.data && (
 							<>
 								<pre className="whitespace-pre-wrap break-all" style={{ color: 'var(--text-secondary)' }}>
-									{commandResult.data.output || '(no output)'}
+									{commandResult.data.output || t('networkTools.noOutput')}
 								</pre>
 								{commandResult.data.error && (
 									<div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border)', color: 'var(--warning)' }}>
-										Exit: {commandResult.data.error}
+										{t('networkTools.exit')}
+										{commandResult.data.error}
 									</div>
 								)}
 							</>

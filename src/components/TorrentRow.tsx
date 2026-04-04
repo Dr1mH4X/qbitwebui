@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import { Check } from 'lucide-react'
 import type { Torrent, TorrentState } from '../types/qbittorrent'
@@ -5,29 +6,32 @@ import { formatSpeed, formatSize, formatEta, formatDate, formatRelativeTime, for
 
 type StateType = 'accent' | 'warning' | 'muted' | 'info' | 'error'
 
-function getStateInfo(state: TorrentState): { label: string; type: StateType; isDownloading: boolean } {
+function getStateInfo(
+	state: TorrentState,
+	t: (key: string) => string
+): { label: string; type: StateType; isDownloading: boolean } {
 	const map: Record<TorrentState, { label: string; type: StateType; isDownloading: boolean }> = {
-		downloading: { label: 'Downloading', type: 'accent', isDownloading: true },
-		uploading: { label: 'Seeding', type: 'warning', isDownloading: false },
-		pausedDL: { label: 'Stopped', type: 'muted', isDownloading: false },
-		pausedUP: { label: 'Stopped', type: 'muted', isDownloading: false },
-		stoppedDL: { label: 'Stopped', type: 'muted', isDownloading: false },
-		stoppedUP: { label: 'Stopped', type: 'muted', isDownloading: false },
-		stalledDL: { label: 'Stalled', type: 'warning', isDownloading: false },
-		stalledUP: { label: 'Seeding', type: 'warning', isDownloading: false },
-		queuedDL: { label: 'Queued', type: 'muted', isDownloading: false },
-		queuedUP: { label: 'Queued', type: 'muted', isDownloading: false },
-		checkingDL: { label: 'Checking', type: 'info', isDownloading: false },
-		checkingUP: { label: 'Checking', type: 'info', isDownloading: false },
-		checkingResumeData: { label: 'Checking', type: 'info', isDownloading: false },
-		forcedDL: { label: 'Forced', type: 'accent', isDownloading: true },
-		forcedUP: { label: 'Forced', type: 'warning', isDownloading: false },
-		metaDL: { label: 'Metadata', type: 'info', isDownloading: false },
-		allocating: { label: 'Allocating', type: 'info', isDownloading: false },
-		moving: { label: 'Moving', type: 'info', isDownloading: false },
-		error: { label: 'Error', type: 'error', isDownloading: false },
-		missingFiles: { label: 'Missing', type: 'error', isDownloading: false },
-		unknown: { label: 'Unknown', type: 'muted', isDownloading: false },
+		downloading: { label: t('torrentRow.downloading'), type: 'accent', isDownloading: true },
+		uploading: { label: t('torrentRow.seeding'), type: 'warning', isDownloading: false },
+		pausedDL: { label: t('torrentRow.stopped'), type: 'muted', isDownloading: false },
+		pausedUP: { label: t('torrentRow.stopped'), type: 'muted', isDownloading: false },
+		stoppedDL: { label: t('torrentRow.stopped'), type: 'muted', isDownloading: false },
+		stoppedUP: { label: t('torrentRow.stopped'), type: 'muted', isDownloading: false },
+		stalledDL: { label: t('torrentRow.stalled'), type: 'warning', isDownloading: false },
+		stalledUP: { label: t('torrentRow.seeding'), type: 'warning', isDownloading: false },
+		queuedDL: { label: t('torrentRow.queued'), type: 'muted', isDownloading: false },
+		queuedUP: { label: t('torrentRow.queued'), type: 'muted', isDownloading: false },
+		checkingDL: { label: t('torrentRow.checking'), type: 'info', isDownloading: false },
+		checkingUP: { label: t('torrentRow.checking'), type: 'info', isDownloading: false },
+		checkingResumeData: { label: t('torrentRow.checking'), type: 'info', isDownloading: false },
+		forcedDL: { label: t('torrentRow.forced'), type: 'accent', isDownloading: true },
+		forcedUP: { label: t('torrentRow.forced'), type: 'warning', isDownloading: false },
+		metaDL: { label: t('torrentRow.metadata'), type: 'info', isDownloading: false },
+		allocating: { label: t('torrentRow.allocating'), type: 'info', isDownloading: false },
+		moving: { label: t('torrentRow.moving'), type: 'info', isDownloading: false },
+		error: { label: t('torrentRow.error'), type: 'error', isDownloading: false },
+		missingFiles: { label: t('torrentRow.missing'), type: 'error', isDownloading: false },
+		unknown: { label: t('torrentRow.unknown'), type: 'muted', isDownloading: false },
 	}
 	return map[state] ?? { label: state, type: 'muted', isDownloading: false }
 }
@@ -45,8 +49,8 @@ function getColor(type: StateType): string {
 
 const TWO_PART_TLD_MARKERS = new Set(['co', 'com', 'net', 'org', 'gov', 'edu'])
 
-function getTrackerName(tracker: string): string {
-	if (!tracker) return '—'
+function getTrackerName(tracker: string, t: (key: string) => string): string {
+	if (!tracker) return t('common.dash')
 	let host = ''
 	try {
 		host = new URL(tracker).hostname
@@ -55,10 +59,10 @@ function getTrackerName(tracker: string): string {
 		const hostPort = withoutScheme.split('/')[0] ?? ''
 		host = hostPort.split(':')[0] ?? ''
 	}
-	if (!host || host.startsWith('**')) return '—'
+	if (!host || host.startsWith('**')) return t('common.dash')
 	const normalized = host.replace(/^www\./i, '')
 	const parts = normalized.split('.').filter(Boolean)
-	if (parts.length === 0) return '—'
+	if (parts.length === 0) return t('common.dash')
 	if (parts.length === 1) return parts[0]
 	const tld = parts[parts.length - 1]
 	const sld = parts[parts.length - 2]
@@ -78,7 +82,7 @@ interface CellContext {
 	isCrossSeed: boolean
 }
 
-function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): ReactNode {
+function renderCell(columnId: string, torrent: Torrent, ctx: CellContext, t: (key: string) => string): ReactNode {
 	switch (columnId) {
 		case 'progress':
 			return ctx.isComplete ? (
@@ -90,7 +94,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 						<Check className="w-3 h-3" style={{ color: 'var(--accent)' }} strokeWidth={3} />
 					</div>
 					<span className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
-						Complete
+						{t('torrentRow.complete')}
 					</span>
 				</div>
 			) : (
@@ -114,7 +118,8 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 									color: 'var(--text-primary)',
 								}}
 							>
-								ETA: {formatEta(torrent.eta)}
+								{t('torrentRow.eta')}
+								{formatEta(torrent.eta)}
 							</div>
 						</div>
 					)}
@@ -123,7 +128,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 		case 'eta':
 			return (
 				<span className="text-xs font-mono whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>
-					{torrent.eta > 0 && torrent.eta < 8640000 ? formatEta(torrent.eta) : '—'}
+					{torrent.eta > 0 && torrent.eta < 8640000 ? formatEta(torrent.eta) : t('common.dash')}
 				</span>
 			)
 		case 'status':
@@ -198,7 +203,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 					{torrent.category}
 				</span>
 			) : (
-				<span className="text-xs text-gray-500">—</span>
+				<span className="text-xs text-gray-500">{t('common.dash')}</span>
 			)
 		case 'tags':
 			return torrent.tags ? (
@@ -213,7 +218,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 					))}
 				</div>
 			) : (
-				<span className="text-xs text-gray-500">—</span>
+				<span className="text-xs text-gray-500">{t('common.dash')}</span>
 			)
 		case 'num_seeds':
 			return (
@@ -254,7 +259,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext): React
 				</span>
 			)
 		case 'tracker_name': {
-			const trackerName = getTrackerName(torrent.tracker)
+			const trackerName = getTrackerName(torrent.tracker, t)
 			return (
 				<span
 					className="text-xs font-mono truncate max-w-[140px] block"
@@ -295,7 +300,8 @@ export function TorrentRow({
 	columnWidths,
 	hasCustomWidths,
 }: Props) {
-	const { label, type, isDownloading } = getStateInfo(torrent.state)
+	const { t } = useTranslation()
+	const { label, type, isDownloading } = getStateInfo(torrent.state, t)
 	const progress = Math.round(torrent.progress * 100)
 	const isComplete = progress >= 100
 	const stateColor = getColor(type)
@@ -307,7 +313,9 @@ export function TorrentRow({
 
 	return (
 		<tr
-			onMouseDown={(e) => { if (e.shiftKey) e.preventDefault() }}
+			onMouseDown={(e) => {
+				if (e.shiftKey) e.preventDefault()
+			}}
 			onClick={(e) => onSelect(torrent.hash, e.ctrlKey || e.metaKey, e.shiftKey)}
 			onContextMenu={onContextMenu}
 			className={`group cursor-pointer transition-colors duration-150 ${isDownloading ? 'downloading' : ''}`}
@@ -346,7 +354,7 @@ export function TorrentRow({
 						className="px-3 py-3"
 						style={columnWidths[id] ? { width: columnWidths[id], maxWidth: columnWidths[id] } : undefined}
 					>
-						{renderCell(id, torrent, cellContext)}
+						{renderCell(id, torrent, cellContext, t)}
 					</td>
 				))}
 			{hasCustomWidths && <td className="w-8" />}

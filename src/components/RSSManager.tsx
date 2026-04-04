@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Plus, ChevronDown, ChevronRight, Rss, RefreshCw, X } from 'lucide-react'
 import { type Instance } from '../api/instances'
 import { useRSSManager } from '../hooks/useRSSManager'
@@ -15,6 +16,7 @@ interface ArticleDownloadProps {
 }
 
 function ArticleDownload({ article, idx, instances, rss }: ArticleDownloadProps) {
+	const { t } = useTranslation()
 	const articleId = article.id || String(idx)
 	const isGrabbing = rss.grabbing === articleId
 	const grabResult = rss.grabResult?.id === articleId ? rss.grabResult : null
@@ -30,7 +32,7 @@ function ArticleDownload({ article, idx, instances, rss }: ArticleDownloadProps)
 					color: grabResult.success ? '#a6e3a1' : 'var(--error)',
 				}}
 			>
-				{grabResult.success ? 'Added!' : 'Failed'}
+				{grabResult.success ? t('rssManager.added') : t('rssManager.failed')}
 			</span>
 		)
 	}
@@ -43,7 +45,7 @@ function ArticleDownload({ article, idx, instances, rss }: ArticleDownloadProps)
 				className="px-2 py-1 rounded text-[10px] font-medium disabled:opacity-50"
 				style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 			>
-				{isGrabbing ? '...' : 'Download'}
+				{isGrabbing ? '...' : t('rssManager.download')}
 			</button>
 		)
 	}
@@ -58,7 +60,7 @@ function ArticleDownload({ article, idx, instances, rss }: ArticleDownloadProps)
 				className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium disabled:opacity-50"
 				style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 			>
-				{isGrabbing ? '...' : 'Download'}
+				{isGrabbing ? '...' : t('rssManager.download')}
 				<ChevronDown className="w-2.5 h-2.5" strokeWidth={2.5} />
 			</button>
 			{isOpen && (
@@ -90,6 +92,7 @@ interface Props {
 }
 
 export function RSSManager({ instances }: Props) {
+	const { t } = useTranslation()
 	const [tab, setTab] = useState<Tab>('feeds')
 	const rss = useRSSManager({ instances })
 
@@ -101,7 +104,7 @@ export function RSSManager({ instances }: Props) {
 				style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 			>
 				<p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-					No instances available
+					{t('rssManager.noInstances')}
 				</p>
 			</div>
 		)
@@ -126,18 +129,18 @@ export function RSSManager({ instances }: Props) {
 					))}
 				</div>
 				<div className="flex items-center gap-1 p-1 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-					{(['feeds', 'rules'] as Tab[]).map((t) => (
+					{(['feeds', 'rules'] as Tab[]).map((tabKey) => (
 						<button
-							key={t}
-							onClick={() => setTab(t)}
+							key={tabKey}
+							onClick={() => setTab(tabKey)}
 							className="px-3 py-1 rounded-md text-xs font-medium capitalize transition-all"
 							style={{
-								backgroundColor: tab === t ? 'var(--bg-primary)' : 'transparent',
-								color: tab === t ? 'var(--text-primary)' : 'var(--text-muted)',
-								boxShadow: tab === t ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+								backgroundColor: tab === tabKey ? 'var(--bg-primary)' : 'transparent',
+								color: tab === tabKey ? 'var(--text-primary)' : 'var(--text-muted)',
+								boxShadow: tab === tabKey ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
 							}}
 						>
-							{t}
+							{tabKey === 'feeds' ? t('rssManager.feeds') : t('rssManager.rules')}
 						</button>
 					))}
 				</div>
@@ -157,7 +160,7 @@ export function RSSManager({ instances }: Props) {
 
 			{rss.loading ? (
 				<div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-					Loading...
+					{t('common.loading')}
 				</div>
 			) : tab === 'feeds' ? (
 				<>
@@ -168,7 +171,7 @@ export function RSSManager({ instances }: Props) {
 							style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 						>
 							<Plus className="w-3.5 h-3.5" strokeWidth={2} />
-							Add Feed
+							{t('rssManager.addFeed')}
 						</button>
 						<button
 							onClick={() => rss.setShowAddFolder(true)}
@@ -176,7 +179,7 @@ export function RSSManager({ instances }: Props) {
 							style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 						>
 							<Plus className="w-3.5 h-3.5" strokeWidth={2} />
-							Add Folder
+							{t('rssManager.addFolder')}
 						</button>
 					</div>
 
@@ -192,7 +195,7 @@ export function RSSManager({ instances }: Props) {
 											className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 											style={{ color: 'var(--text-muted)' }}
 										>
-											Feed URL
+											{t('rssManager.feedUrl')}
 										</label>
 										<input
 											type="url"
@@ -213,13 +216,13 @@ export function RSSManager({ instances }: Props) {
 											className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 											style={{ color: 'var(--text-muted)' }}
 										>
-											Folder (optional)
+											{t('rssManager.folder')}
 										</label>
 										<Select
 											value={rss.feedPath}
 											onChange={rss.setFeedPath}
 											options={[
-												{ value: '', label: 'None' },
+												{ value: '', label: t('common.none') },
 												...rss.feeds.filter((f) => f.isFolder).map((f) => ({ value: f.path, label: f.path })),
 											]}
 											minWidth="100%"
@@ -234,7 +237,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50"
 										style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 									>
-										{rss.submitting ? 'Adding...' : 'Add'}
+										{rss.submitting ? t('rssManager.adding') : t('rssManager.add')}
 									</button>
 									<button
 										type="button"
@@ -242,7 +245,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs border"
 										style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 									>
-										Cancel
+										{t('rssManager.cancel')}
 									</button>
 								</div>
 							</form>
@@ -260,7 +263,7 @@ export function RSSManager({ instances }: Props) {
 										className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 										style={{ color: 'var(--text-muted)' }}
 									>
-										Folder Name
+										{t('rssManager.folderName')}
 									</label>
 									<input
 										type="text"
@@ -283,7 +286,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50"
 										style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 									>
-										{rss.submitting ? 'Creating...' : 'Create'}
+										{rss.submitting ? t('rssManager.creating') : t('rssManager.create')}
 									</button>
 									<button
 										type="button"
@@ -291,7 +294,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs border"
 										style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 									>
-										Cancel
+										{t('rssManager.cancel')}
 									</button>
 								</div>
 							</form>
@@ -307,12 +310,12 @@ export function RSSManager({ instances }: Props) {
 								className="px-3 py-2 border-b text-[10px] font-semibold uppercase tracking-wider"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 							>
-								Feeds
+								{t('rssManager.feeds')}
 							</div>
 							<div className="max-h-[400px] overflow-y-auto">
 								{rss.visibleFeeds.length === 0 ? (
 									<div className="px-3 py-6 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-										No feeds
+										{t('rssManager.noFeeds')}
 									</div>
 								) : (
 									rss.visibleFeeds.map((feed) => (
@@ -393,7 +396,10 @@ export function RSSManager({ instances }: Props) {
 								className="px-3 py-2 border-b text-[10px] font-semibold uppercase tracking-wider flex items-center justify-between"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 							>
-								<span>Articles {rss.selectedFeed && `(${rss.feedArticles.length})`}</span>
+								<span>
+									{t('rssManager.articles')}
+									{rss.selectedFeed && `(${rss.feedArticles.length})`}
+								</span>
 								{rss.selectedFeed && (
 									<span className="font-normal normal-case truncate max-w-[200px]" title={rss.selectedFeed.url}>
 										{rss.selectedFeed.name}
@@ -403,7 +409,7 @@ export function RSSManager({ instances }: Props) {
 							<div className="max-h-[400px] overflow-y-auto">
 								{!rss.selectedFeed ? (
 									<div className="px-3 py-12 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-										Select a feed to view articles
+										{t('rssManager.selectFeed')}
 									</div>
 								) : rss.feedArticles.length > 0 ? (
 									rss.feedArticles.map((article, idx) => (
@@ -433,15 +439,15 @@ export function RSSManager({ instances }: Props) {
 									))
 								) : rss.selectedFeed.data?.isLoading ? (
 									<div className="px-3 py-12 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-										Loading feed...
+										{t('rssManager.loadingFeed')}
 									</div>
 								) : rss.selectedFeed.data?.hasError ? (
 									<div className="px-3 py-12 text-center text-xs" style={{ color: 'var(--error)' }}>
-										Failed to load feed
+										{t('rssManager.failedToLoad')}
 									</div>
 								) : (
 									<div className="px-3 py-12 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-										No articles - try refreshing
+										{t('rssManager.noArticles')}
 									</div>
 								)}
 							</div>
@@ -457,7 +463,7 @@ export function RSSManager({ instances }: Props) {
 							style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 						>
 							<Plus className="w-3.5 h-3.5" strokeWidth={2} />
-							New Rule
+							{t('rssManager.newRule')}
 						</button>
 					</div>
 
@@ -472,7 +478,7 @@ export function RSSManager({ instances }: Props) {
 										className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 										style={{ color: 'var(--text-muted)' }}
 									>
-										Rule Name
+										{t('rssManager.ruleName')}
 									</label>
 									<input
 										type="text"
@@ -495,7 +501,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50"
 										style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 									>
-										{rss.submitting ? 'Creating...' : 'Create'}
+										{rss.submitting ? t('rssManager.creating') : t('rssManager.create')}
 									</button>
 									<button
 										type="button"
@@ -503,7 +509,7 @@ export function RSSManager({ instances }: Props) {
 										className="px-3 py-1.5 rounded-lg text-xs border"
 										style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 									>
-										Cancel
+										{t('rssManager.cancel')}
 									</button>
 								</div>
 							</form>
@@ -519,12 +525,12 @@ export function RSSManager({ instances }: Props) {
 								className="px-3 py-2 border-b text-[10px] font-semibold uppercase tracking-wider"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 							>
-								Rules ({Object.keys(rss.rules).length})
+								{t('rssManager.rules')} ({Object.keys(rss.rules).length})
 							</div>
 							<div className="max-h-[500px] overflow-y-auto">
 								{Object.keys(rss.rules).length === 0 ? (
 									<div className="px-3 py-6 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-										No rules
+										{t('rssManager.noRules')}
 									</div>
 								) : (
 									Object.entries(rss.rules).map(([name, rule]) => (
@@ -567,16 +573,16 @@ export function RSSManager({ instances }: Props) {
 								className="px-3 py-2 border-b text-[10px] font-semibold uppercase tracking-wider"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 							>
-								{rss.selectedRule ? `Edit: ${rss.selectedRule}` : 'Rule Editor'}
+								{rss.selectedRule ? `${t('rssManager.edit')}: ${rss.selectedRule}` : t('rssManager.ruleEditor')}
 							</div>
 							{!rss.selectedRule || !rss.editingRule ? (
 								<div className="px-3 py-12 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-									Select a rule to edit
+									{t('rssManager.selectRule')}
 								</div>
 							) : (
 								<div className="p-4 space-y-4 max-h-[500px] overflow-y-auto">
 									<Checkbox
-										label="Enabled"
+										label={t('common.enabled')}
 										checked={rss.editingRule.enabled}
 										onChange={(v) => rss.setEditingRule({ ...rss.editingRule!, enabled: v })}
 									/>
@@ -587,7 +593,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Must Contain
+												{t('rssManager.mustContain')}
 											</label>
 											<input
 												type="text"
@@ -607,7 +613,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Must NOT Contain
+												{t('rssManager.mustNotContain')}
 											</label>
 											<input
 												type="text"
@@ -626,12 +632,12 @@ export function RSSManager({ instances }: Props) {
 
 									<div className="flex items-center gap-4">
 										<Checkbox
-											label="Use Regex"
+											label={t('rssManager.useRegex')}
 											checked={rss.editingRule.useRegex}
 											onChange={(v) => rss.setEditingRule({ ...rss.editingRule!, useRegex: v })}
 										/>
 										<Checkbox
-											label="Smart Episode Filter"
+											label={t('rssManager.smartEpisodeFilter')}
 											checked={rss.editingRule.smartFilter}
 											onChange={(v) => rss.setEditingRule({ ...rss.editingRule!, smartFilter: v })}
 										/>
@@ -643,7 +649,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Episode Filter
+												{t('rssManager.episodeFilter')}
 											</label>
 											<input
 												type="text"
@@ -663,7 +669,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Ignore Days
+												{t('rssManager.ignoreDays')}
 											</label>
 											<input
 												type="number"
@@ -688,7 +694,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Category
+												{t('rssManager.category')}
 											</label>
 											<select
 												value={rss.editingRule.assignedCategory}
@@ -700,7 +706,7 @@ export function RSSManager({ instances }: Props) {
 													color: 'var(--text-primary)',
 												}}
 											>
-												<option value="">None</option>
+												<option value="">{t('common.none')}</option>
 												{Object.keys(rss.categories).map((cat) => (
 													<option key={cat} value={cat}>
 														{cat}
@@ -713,7 +719,7 @@ export function RSSManager({ instances }: Props) {
 												className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Add Paused
+												{t('rssManager.addPaused')}
 											</label>
 											<select
 												value={
@@ -736,9 +742,9 @@ export function RSSManager({ instances }: Props) {
 													color: 'var(--text-primary)',
 												}}
 											>
-												<option value="default">Use global setting</option>
-												<option value="always">Always</option>
-												<option value="never">Never</option>
+												<option value="default">{t('rssManager.useGlobalSetting')}</option>
+												<option value="always">{t('rssManager.always')}</option>
+												<option value="never">{t('rssManager.never')}</option>
 											</select>
 										</div>
 									</div>
@@ -748,7 +754,7 @@ export function RSSManager({ instances }: Props) {
 											className="block text-[10px] font-medium mb-1 uppercase tracking-wider"
 											style={{ color: 'var(--text-muted)' }}
 										>
-											Save Path
+											{t('rssManager.savePath')}
 										</label>
 										<input
 											type="text"
@@ -769,7 +775,7 @@ export function RSSManager({ instances }: Props) {
 											className="block text-[10px] font-medium mb-2 uppercase tracking-wider"
 											style={{ color: 'var(--text-muted)' }}
 										>
-											Apply to Feeds
+											{t('rssManager.applyToFeeds')}
 										</label>
 										<div
 											className="max-h-32 overflow-y-auto rounded border p-2 space-y-1"
@@ -777,7 +783,7 @@ export function RSSManager({ instances }: Props) {
 										>
 											{rss.feedUrls.length === 0 ? (
 												<div className="text-xs py-2 text-center" style={{ color: 'var(--text-muted)' }}>
-													No feeds available
+													{t('rssManager.noFeedsAvailable')}
 												</div>
 											) : (
 												rss.feedUrls.map((url) => (
@@ -807,14 +813,18 @@ export function RSSManager({ instances }: Props) {
 												color: rss.ruleSaved ? '#1e1e2e' : 'var(--accent-contrast)',
 											}}
 										>
-											{rss.savingRule ? 'Saving...' : rss.ruleSaved ? 'Saved!' : 'Save'}
+											{rss.savingRule
+												? t('rssManager.saving')
+												: rss.ruleSaved
+													? t('rssManager.saved')
+													: t('common.save')}
 										</button>
 										<button
 											onClick={rss.handleCancelEdit}
 											className="px-4 py-2 rounded-lg text-xs border"
 											style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 										>
-											Cancel
+											{t('common.cancel')}
 										</button>
 										<button
 											onClick={rss.handlePreviewMatches}
@@ -822,7 +832,7 @@ export function RSSManager({ instances }: Props) {
 											className="px-4 py-2 rounded-lg text-xs border disabled:opacity-50"
 											style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 										>
-											{rss.loadingMatches ? 'Loading...' : 'Preview Matches'}
+											{rss.loadingMatches ? t('common.loading') : t('rssManager.previewMatches')}
 										</button>
 									</div>
 
@@ -832,7 +842,7 @@ export function RSSManager({ instances }: Props) {
 												className="text-[10px] font-semibold uppercase tracking-wider mb-2"
 												style={{ color: 'var(--text-muted)' }}
 											>
-												Matching Articles
+												{t('rssManager.matchingArticles')}
 											</div>
 											<div
 												className="max-h-40 overflow-y-auto rounded border p-2"
@@ -840,7 +850,7 @@ export function RSSManager({ instances }: Props) {
 											>
 												{Object.keys(rss.matchingArticles).length === 0 ? (
 													<div className="text-xs py-2 text-center" style={{ color: 'var(--text-muted)' }}>
-														No matches
+														{t('rssManager.noMatches')}
 													</div>
 												) : (
 													Object.entries(rss.matchingArticles).map(([feedName, matchedTitles]) => (
@@ -884,12 +894,11 @@ export function RSSManager({ instances }: Props) {
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-							Delete {rss.deleteConfirm.isFolder ? 'Folder' : 'Feed'}
+							{t(rss.deleteConfirm.isFolder ? 'rssManager.deleteFolder' : 'rssManager.deleteFeed')}
 						</h3>
 						<p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-							Are you sure you want to delete{' '}
-							<strong style={{ color: 'var(--text-primary)' }}>{rss.deleteConfirm.name}</strong>?
-							{rss.deleteConfirm.isFolder && ' This will also delete all feeds inside.'}
+							{t('common.confirmDelete', { name: rss.deleteConfirm.name })}
+							{rss.deleteConfirm.isFolder && t('rssManager.willAlsoDelete')}
 						</p>
 						<div className="flex gap-3 justify-end">
 							<button
@@ -897,14 +906,14 @@ export function RSSManager({ instances }: Props) {
 								className="px-4 py-2 rounded-lg text-sm border"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 							<button
 								onClick={rss.handleDeleteItem}
 								className="px-4 py-2 rounded-lg text-sm font-medium"
 								style={{ backgroundColor: 'var(--error)', color: 'var(--accent-contrast)' }}
 							>
-								Delete
+								{t('common.delete')}
 							</button>
 						</div>
 					</div>
@@ -921,11 +930,10 @@ export function RSSManager({ instances }: Props) {
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-							Delete Rule
+							{t('rssManager.deleteRule')}
 						</h3>
 						<p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-							Are you sure you want to delete{' '}
-							<strong style={{ color: 'var(--text-primary)' }}>{rss.ruleDeleteConfirm}</strong>?
+							{t('common.confirmDelete', { name: rss.ruleDeleteConfirm })}
 						</p>
 						<div className="flex gap-3 justify-end">
 							<button
@@ -933,14 +941,14 @@ export function RSSManager({ instances }: Props) {
 								className="px-4 py-2 rounded-lg text-sm border"
 								style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 							<button
 								onClick={rss.handleDeleteRule}
 								className="px-4 py-2 rounded-lg text-sm font-medium"
 								style={{ backgroundColor: 'var(--error)', color: 'var(--accent-contrast)' }}
 							>
-								Delete
+								{t('common.delete')}
 							</button>
 						</div>
 					</div>

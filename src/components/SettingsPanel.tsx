@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Settings, X } from 'lucide-react'
 import type { Instance } from '../api/instances'
 import type { QBittorrentPreferences } from '../types/preferences'
@@ -14,10 +15,10 @@ import { AdvancedTab } from './settings/AdvancedTab'
 
 type SettingsTab = 'behavior' | 'downloads' | 'connection' | 'speed' | 'bittorrent' | 'rss' | 'webui' | 'advanced'
 
-const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
+const TAB_KEYS: { id: SettingsTab; labelKey: string; icon: ReactNode }[] = [
 	{
 		id: 'behavior',
-		label: 'Behavior',
+		labelKey: 'settings.tabs.behavior',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -28,7 +29,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'downloads',
-		label: 'Downloads',
+		labelKey: 'settings.tabs.downloads',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -39,7 +40,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'connection',
-		label: 'Connection',
+		labelKey: 'settings.tabs.connection',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -50,7 +51,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'speed',
-		label: 'Speed',
+		labelKey: 'settings.tabs.speed',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -61,7 +62,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'bittorrent',
-		label: 'BitTorrent',
+		labelKey: 'settings.tabs.bittorrent',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -72,7 +73,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'rss',
-		label: 'RSS',
+		labelKey: 'settings.tabs.rss',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -83,7 +84,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'webui',
-		label: 'WebUI',
+		labelKey: 'settings.tabs.webui',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -94,7 +95,7 @@ const TABS: { id: SettingsTab; label: string; icon: ReactNode }[] = [
 	},
 	{
 		id: 'advanced',
-		label: 'Advanced',
+		labelKey: 'settings.tabs.advanced',
 		icon: (
 			<path
 				strokeLinecap="round"
@@ -111,6 +112,7 @@ interface Props {
 }
 
 export function SettingsPanel({ instance, onClose }: Props) {
+	const { t } = useTranslation()
 	const [activeTab, setActiveTab] = useState<SettingsTab>('behavior')
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
@@ -127,13 +129,13 @@ export function SettingsPanel({ instance, onClose }: Props) {
 				setPreferencesState(prefs)
 				setOriginalPreferences(prefs)
 			} catch {
-				setError('Failed to load preferences')
+				setError(t('settings.failedToLoad'))
 			} finally {
 				setLoading(false)
 			}
 		}
 		load()
-	}, [instance.id])
+	}, [instance.id, t])
 
 	function handleChange(updates: Partial<QBittorrentPreferences>) {
 		setPreferencesState((prev) => ({ ...prev, ...updates }))
@@ -155,7 +157,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 			}
 			onClose()
 		} catch {
-			setError('Failed to save preferences')
+			setError(t('settings.failedToSave'))
 		} finally {
 			setSaving(false)
 		}
@@ -167,7 +169,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 	)
 
 	function handleClose() {
-		if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return
+		if (hasChanges && !confirm(t('common.unsavedChanges'))) return
 		onClose()
 	}
 
@@ -183,10 +185,10 @@ export function SettingsPanel({ instance, onClose }: Props) {
 				<div className="flex items-center gap-3">
 					<Settings className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={1.5} />
 					<span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-						Settings
+						{t('settings.title')}
 					</span>
 					<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-						— {instance.label}
+						{t('common.dash')} {instance.label}
 					</span>
 				</div>
 				<div className="flex items-center gap-2">
@@ -198,7 +200,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 								color: 'var(--warning)',
 							}}
 						>
-							unsaved
+							{t('settings.unsaved')}
 						</span>
 					)}
 					<button
@@ -216,7 +218,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 				className="flex border-b overflow-x-auto"
 				style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-primary)' }}
 			>
-				{TABS.map((tab) => (
+				{TAB_KEYS.map((tab) => (
 					<button
 						type="button"
 						key={tab.id}
@@ -231,7 +233,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 						<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
 							{tab.icon}
 						</svg>
-						<span className="hidden sm:inline">{tab.label}</span>
+						<span className="hidden sm:inline">{t(tab.labelKey)}</span>
 					</button>
 				))}
 			</div>
@@ -276,7 +278,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 							className="px-3 py-1.5 rounded text-xs font-medium disabled:opacity-50 transition-colors"
 							style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 						>
-							{saving ? 'Saving...' : 'Save'}
+							{saving ? t('settings.saving') : t('settings.save')}
 						</button>
 						<button
 							type="button"
@@ -284,7 +286,7 @@ export function SettingsPanel({ instance, onClose }: Props) {
 							className="px-3 py-1.5 rounded text-xs border transition-colors hover:bg-[var(--bg-primary)]"
 							style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 						>
-							Cancel
+							{t('settings.cancel')}
 						</button>
 					</div>
 				</>

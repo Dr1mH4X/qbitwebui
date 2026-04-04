@@ -1,7 +1,7 @@
 import type { CustomView, CustomViewsStorage } from '../types/views'
 import type { TorrentFilter } from '../types/qbittorrent'
 import type { SortKey } from '../components/columns'
-import { COLUMNS } from '../components/columns'
+import { COLUMN_IDS } from '../components/columns'
 
 const STORAGE_KEY = 'customViews'
 
@@ -15,7 +15,7 @@ export function loadCustomViews(): CustomViewsStorage {
 	if (!stored) return DEFAULT_STORAGE
 	try {
 		const parsed = JSON.parse(stored) as CustomViewsStorage
-		const knownColumns = new Set(COLUMNS.map((c) => c.id))
+		const knownColumns = new Set(COLUMN_IDS)
 		parsed.views = parsed.views.map((view) => ({
 			...view,
 			visibleColumns: view.visibleColumns.filter((id) => knownColumns.has(id)),

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Settings, X, Check, Pencil, Trash2 } from 'lucide-react'
 import {
 	useCategories,
@@ -18,6 +19,7 @@ interface Props {
 type Tab = 'categories' | 'tags'
 
 export function CategoryTagManager({ open, onClose }: Props) {
+	const { t } = useTranslation()
 	const [tab, setTab] = useState<Tab>('categories')
 	const [newCategoryName, setNewCategoryName] = useState('')
 	const [newCategorySavePath, setNewCategorySavePath] = useState('')
@@ -94,7 +96,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 								<Settings className="w-5 h-5" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 							</div>
 							<h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-								Manage Categories & Tags
+								{t('categoryTagManager.title')}
 							</h3>
 						</div>
 						<button
@@ -120,7 +122,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 									color: tab === 'categories' ? 'var(--accent-contrast)' : 'var(--text-muted)',
 								}}
 							>
-								Categories
+								{t('categoryTagManager.categories')}
 							</button>
 							<button
 								type="button"
@@ -131,7 +133,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 									color: tab === 'tags' ? 'var(--accent-contrast)' : 'var(--text-muted)',
 								}}
 							>
-								Tags
+								{t('categoryTagManager.tags')}
 							</button>
 						</div>
 
@@ -140,7 +142,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 								<div className="max-h-64 overflow-y-auto space-y-1">
 									{Object.entries(categories).length === 0 ? (
 										<div className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>
-											No categories
+											{t('categoryTagManager.noCategories')}
 										</div>
 									) : (
 										Object.entries(categories).map(([name, cat]) => (
@@ -162,7 +164,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 																if (e.key === 'Enter') handleEditCategory(name)
 																if (e.key === 'Escape') setEditingCategory(null)
 															}}
-															placeholder="Save path"
+															placeholder={t('categoryTagManager.savePath')}
 															autoFocus
 															className="flex-1 px-2 py-1 rounded border text-xs focus:outline-none"
 															style={{
@@ -192,7 +194,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 															{name}
 														</span>
 														<span className="text-xs truncate flex-1" style={{ color: 'var(--text-muted)' }}>
-															{cat.savePath || '(default)'}
+															{cat.savePath || t('categoryTagManager.defaultPath')}
 														</span>
 														<button
 															onClick={() => startEditCategory(name, cat.savePath)}
@@ -220,7 +222,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 										type="text"
 										value={newCategoryName}
 										onChange={(e) => setNewCategoryName(e.target.value)}
-										placeholder="Name"
+										placeholder={t('categoryTagManager.name')}
 										className="flex-1 px-3 py-2 rounded-lg border text-xs focus:outline-none"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -232,7 +234,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 										type="text"
 										value={newCategorySavePath}
 										onChange={(e) => setNewCategorySavePath(e.target.value)}
-										placeholder="Save path (optional)"
+										placeholder={t('categoryTagManager.savePathOptional')}
 										className="flex-1 px-3 py-2 rounded-lg border text-xs focus:outline-none"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -246,7 +248,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 										className="px-4 py-2 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
 										style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 									>
-										Add
+										{t('common.add')}
 									</button>
 								</form>
 							</div>
@@ -255,7 +257,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 								<div className="max-h-64 overflow-y-auto space-y-1">
 									{tags.length === 0 ? (
 										<div className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>
-											No tags
+											{t('categoryTagManager.noTags')}
 										</div>
 									) : (
 										tags.map((tag) => (
@@ -284,7 +286,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 										type="text"
 										value={newTag}
 										onChange={(e) => setNewTag(e.target.value)}
-										placeholder="New tag name"
+										placeholder={t('categoryTagManager.newTagName')}
 										className="flex-1 px-3 py-2 rounded-lg border text-xs focus:outline-none"
 										style={{
 											backgroundColor: 'var(--bg-secondary)',
@@ -298,7 +300,7 @@ export function CategoryTagManager({ open, onClose }: Props) {
 										className="px-4 py-2 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
 										style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 									>
-										Add
+										{t('common.add')}
 									</button>
 								</form>
 							</div>

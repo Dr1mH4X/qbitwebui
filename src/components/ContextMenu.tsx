@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import {
 	useCategories,
@@ -26,6 +27,7 @@ interface Props {
 type Submenu = 'category' | 'addTag' | 'removeTag' | 'delete' | null
 
 export function ContextMenu({ x, y, torrents, onClose }: Props) {
+	const { t } = useTranslation()
 	const [submenu, setSubmenu] = useState<Submenu>(null)
 	const [renaming, setRenaming] = useState(false)
 	const [newName, setNewName] = useState('')
@@ -146,7 +148,7 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 		return (
 			<div ref={ref} className="rounded-lg border shadow-xl z-[200] p-3" style={menuStyle}>
 				<div className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-					Rename torrent
+					{t('contextMenu.renameTorrent')}
 				</div>
 				<input
 					ref={inputRef}
@@ -166,14 +168,14 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 						className="flex-1 py-1.5 rounded-lg text-xs"
 						style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-muted)' }}
 					>
-						Cancel
+						{t('common.cancel')}
 					</button>
 					<button
 						onClick={handleRename}
 						className="flex-1 py-1.5 rounded-lg text-xs"
 						style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 					>
-						Rename
+						{t('contextMenu.rename')}
 					</button>
 				</div>
 			</div>
@@ -182,18 +184,18 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 
 	return (
 		<div ref={ref} className="rounded-lg border shadow-xl z-[200] py-1 min-w-[160px]" style={menuStyle}>
-			<MenuItem onClick={handleStart}>Start</MenuItem>
-			<MenuItem onClick={handleStop}>Stop</MenuItem>
-			<MenuItem onClick={handleRecheck}>Force Recheck</MenuItem>
-			<MenuItem onClick={handleReannounce}>Force Reannounce</MenuItem>
+			<MenuItem onClick={handleStart}>{t('contextMenu.start')}</MenuItem>
+			<MenuItem onClick={handleStop}>{t('contextMenu.stop')}</MenuItem>
+			<MenuItem onClick={handleRecheck}>{t('contextMenu.forceRecheck')}</MenuItem>
+			<MenuItem onClick={handleReannounce}>{t('contextMenu.forceReannounce')}</MenuItem>
 			<div className="h-px my-1" style={{ backgroundColor: 'var(--border)' }} />
 			<MenuItem onClick={() => setSubmenu(submenu === 'category' ? null : 'category')} hasSubmenu>
-				Set Category
+				{t('contextMenu.setCategory')}
 			</MenuItem>
 			{submenu === 'category' && (
 				<div className="pl-2">
 					<MenuItem onClick={() => handleSetCategory('')} small>
-						None
+						{t('common.none')}
 					</MenuItem>
 					{Object.keys(categories).map((cat) => (
 						<MenuItem key={cat} onClick={() => handleSetCategory(cat)} small>
@@ -203,13 +205,13 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 				</div>
 			)}
 			<MenuItem onClick={() => setSubmenu(submenu === 'addTag' ? null : 'addTag')} hasSubmenu>
-				Add Tag
+				{t('contextMenu.addTag')}
 			</MenuItem>
 			{submenu === 'addTag' && (
 				<div className="pl-2">
 					{tags.length === 0 ? (
 						<div className="px-3 py-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-							No tags
+							{t('contextMenu.noTags')}
 						</div>
 					) : (
 						tags.map((tag) => (
@@ -223,7 +225,7 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 			{isSingle && currentTags.length > 0 && (
 				<>
 					<MenuItem onClick={() => setSubmenu(submenu === 'removeTag' ? null : 'removeTag')} hasSubmenu>
-						Remove Tag
+						{t('contextMenu.removeTag')}
 					</MenuItem>
 					{submenu === 'removeTag' && (
 						<div className="pl-2">
@@ -239,21 +241,21 @@ export function ContextMenu({ x, y, torrents, onClose }: Props) {
 			{isSingle && (
 				<>
 					<div className="h-px my-1" style={{ backgroundColor: 'var(--border)' }} />
-					<MenuItem onClick={startRename}>Rename</MenuItem>
+					<MenuItem onClick={startRename}>{t('contextMenu.rename')}</MenuItem>
 				</>
 			)}
 			<div className="h-px my-1" style={{ backgroundColor: 'var(--border)' }} />
-			<MenuItem onClick={handleExport}>Export</MenuItem>
+			<MenuItem onClick={handleExport}>{t('contextMenu.export')}</MenuItem>
 			<MenuItem onClick={() => setSubmenu(submenu === 'delete' ? null : 'delete')} hasSubmenu>
-				Delete
+				{t('contextMenu.delete')}
 			</MenuItem>
 			{submenu === 'delete' && (
 				<div className="pl-2">
 					<MenuItem onClick={() => handleDelete(false)} small>
-						Keep files
+						{t('contextMenu.keepFiles')}
 					</MenuItem>
 					<MenuItem onClick={() => handleDelete(true)} small>
-						Delete files
+						{t('contextMenu.deleteFiles')}
 					</MenuItem>
 				</div>
 			)}

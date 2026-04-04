@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { Plus, X, Upload, CheckCircle, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAddTorrent, useCategories } from '../hooks/useTorrents'
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 type Tab = 'link' | 'file'
 
 export function AddTorrentModal({ open, onClose }: Props) {
+	const { t } = useTranslation()
 	const [tab, setTab] = useState<Tab>('link')
 	const [url, setUrl] = useState('')
 	const [files, setFiles] = useState<File[]>([])
@@ -101,7 +103,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 								<Plus className="w-5 h-5" style={{ color: 'var(--accent)' }} strokeWidth={2} />
 							</div>
 							<h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-								Add Torrent
+								{t('addTorrentModal.title')}
 							</h3>
 						</div>
 						<button
@@ -127,7 +129,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 									color: tab === 'link' ? 'var(--accent-contrast)' : 'var(--text-muted)',
 								}}
 							>
-								Magnet / URL
+								{t('addTorrentModal.magnetUrl')}
 							</button>
 							<button
 								type="button"
@@ -138,19 +140,19 @@ export function AddTorrentModal({ open, onClose }: Props) {
 									color: tab === 'file' ? 'var(--accent-contrast)' : 'var(--text-muted)',
 								}}
 							>
-								Torrent File
+								{t('addTorrentModal.torrentFile')}
 							</button>
 						</div>
 
 						{tab === 'link' ? (
 							<div>
 								<label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-									Magnet link or URL
+									{t('addTorrentModal.magnetPlaceholder')}
 								</label>
 								<textarea
 									value={url}
 									onChange={(e) => setUrl(e.target.value)}
-									placeholder="magnet:?xt=urn:btih:... or https://..."
+									placeholder={t('addTorrentModal.magnetHint')}
 									rows={3}
 									className="w-full px-4 py-3 rounded-xl border text-sm resize-none focus:outline-none transition-colors"
 									style={{
@@ -163,7 +165,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 						) : (
 							<div>
 								<label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-									Torrent files
+									{t('addTorrentModal.torrentFiles')}
 								</label>
 								<input
 									ref={fileInputRef}
@@ -181,7 +183,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 								>
 									<div className="flex flex-col items-center gap-2" style={{ color: 'var(--text-muted)' }}>
 										<Upload className="w-6 h-6" strokeWidth={1.5} />
-										<span>Click or drop .torrent files</span>
+										<span>{t('addTorrentModal.dropHint')}</span>
 									</div>
 								</button>
 								{files.length > 0 && (
@@ -214,7 +216,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 						<div className="grid grid-cols-2 gap-3">
 							<div>
 								<label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-									Category
+									{t('addTorrentModal.category')}
 								</label>
 								<select
 									value={category}
@@ -226,7 +228,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 										color: 'var(--text-primary)',
 									}}
 								>
-									<option value="">None</option>
+									<option value="">{t('common.none')}</option>
 									{Object.keys(categories).map((cat) => (
 										<option key={cat} value={cat}>
 											{cat}
@@ -236,13 +238,13 @@ export function AddTorrentModal({ open, onClose }: Props) {
 							</div>
 							<div>
 								<label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-									Tags
+									{t('addTorrentModal.tags')}
 								</label>
 								<input
 									type="text"
 									value={tags}
 									onChange={(e) => setTags(e.target.value)}
-									placeholder="tag1, tag2"
+									placeholder={t('addTorrentModal.tagsPlaceholder')}
 									className="w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors"
 									style={{
 										backgroundColor: 'var(--bg-secondary)',
@@ -255,13 +257,13 @@ export function AddTorrentModal({ open, onClose }: Props) {
 
 						<div>
 							<label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-								Save path
+								{t('addTorrentModal.savePath')}
 							</label>
 							<input
 								type="text"
 								value={savepath}
 								onChange={(e) => setSavepath(e.target.value)}
-								placeholder="Default"
+								placeholder={t('common.default')}
 								className="w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors"
 								style={{
 									backgroundColor: 'var(--bg-secondary)',
@@ -291,7 +293,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 									)}
 								</div>
 								<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Start torrent
+									{t('addTorrentModal.startTorrent')}
 								</span>
 							</label>
 							<label className="flex items-center gap-2 cursor-pointer">
@@ -313,7 +315,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 									)}
 								</div>
 								<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-									Sequential
+									{t('addTorrentModal.sequential')}
 								</span>
 							</label>
 						</div>
@@ -329,7 +331,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 									color: 'var(--text-muted)',
 								}}
 							>
-								Cancel
+								{t('common.cancel')}
 							</button>
 							<button
 								type="submit"
@@ -339,7 +341,7 @@ export function AddTorrentModal({ open, onClose }: Props) {
 								className="flex-1 py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 							>
-								{addMutation.isPending ? 'Adding...' : 'Add Torrent'}
+								{addMutation.isPending ? t('addTorrentModal.adding') : t('addTorrentModal.title')}
 							</button>
 						</div>
 					</form>
