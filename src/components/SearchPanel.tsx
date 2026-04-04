@@ -29,8 +29,9 @@ export function SearchPanel() {
 		const diff = now.getTime() - date.getTime()
 		const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 		if (days === 0) return t('common.today')
-		if (days === 1) return `1 ${t('searchPanel.days').trim()}`
-		if (days < 30) return `${days}${t('searchPanel.months')}`
+		if (days === 1) return `1${t('searchPanel.day')}`
+		if (days < 30) return `${days}${t('searchPanel.days')}`
+		if (days < 365) return `${Math.floor(days / 30)}${t('searchPanel.months')}`
 		return `${Math.floor(days / 365)}${t('searchPanel.years')}`
 	}
 

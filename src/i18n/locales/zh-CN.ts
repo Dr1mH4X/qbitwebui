@@ -689,6 +689,7 @@ const zhCN = {
 		selectInstance: '选择实例...',
 		grabbing: '抓取中...',
 		days: ' 天',
+		day: ' 天',
 		weeks: ' 周',
 		months: ' 月',
 		years: ' 年',

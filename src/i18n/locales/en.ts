@@ -689,6 +689,7 @@ const en = {
 		selectInstance: 'Select instance...',
 		grabbing: 'Grabbing...',
 		days: ' days',
+		day: ' day',
 		weeks: ' weeks',
 		months: ' months',
 		years: ' years',
