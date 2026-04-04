@@ -127,7 +127,7 @@ export function Header({ activeTab, onTabChange, username, authDisabled, onLogou
 						{hasUpdate ? (
 							<Info className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} strokeWidth={2} />
 						) : (
-							<Check className="w-3.5 h-3.5" style={{ color: '#a6e3a3' }} strokeWidth={2.5} />
+							<Check className="w-3.5 h-3.5" style={{ color: '#a6e3a1' }} strokeWidth={2.5} />
 						)}
 					</div>
 					<div className="absolute right-0 top-full mt-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition">

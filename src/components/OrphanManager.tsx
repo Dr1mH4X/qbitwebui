@@ -165,8 +165,7 @@ export function OrphanManager({ instances }: Props) {
 								{selected.size === orphans.length ? t('orphanManager.deselectAll') : t('orphanManager.selectAll')}
 							</button>
 							<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-								{selected.size} of {orphans.length}
-								{t('orphanManager.selected')}
+								{t('orphanManager.selectedCount', { selected: selected.size, total: orphans.length })}
 							</span>
 						</div>
 						{selected.size > 0 && (

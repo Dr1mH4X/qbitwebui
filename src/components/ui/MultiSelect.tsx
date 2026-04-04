@@ -15,8 +15,9 @@ interface MultiSelectProps {
 	placeholder?: string
 }
 
-export function MultiSelect({ options, selected, onChange, placeholder = 'Select...' }: MultiSelectProps) {
+export function MultiSelect({ options, selected, onChange, placeholder }: MultiSelectProps) {
 	const { t } = useTranslation()
+	const displayPlaceholder = placeholder || t('multiSelect.select')
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 
@@ -47,7 +48,7 @@ export function MultiSelect({ options, selected, onChange, placeholder = 'Select
 		}
 	}
 
-	const displayText = selected.length === 0 ? placeholder : `${selected.length} selected`
+	const displayText = selected.length === 0 ? displayPlaceholder : `${selected.length} ${t('multiSelect.selected')}`
 
 	return (
 		<div ref={ref} className="relative">

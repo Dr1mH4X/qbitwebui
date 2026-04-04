@@ -205,7 +205,7 @@ const en = {
 		alt: 'Alt',
 		total: 'Total',
 		dht: 'DHT',
-		of: 'of',
+		rangeOf: '{{start}}-{{end}} of {{total}}',
 	},
 
 	instanceManager: {
@@ -674,8 +674,8 @@ const en = {
 		added: 'Added!',
 		noInstances: 'No instances',
 		grab: 'Grab',
-		noResultsMatch: 'No results match "',
-		results: ' results',
+		noResultsMatch: 'No results match "{{query}}"',
+		resultsCount: '{{count}} results',
 		noResultsFound: 'No results found',
 		addIntegration: 'Add Integration',
 		deleteIntegration: 'Delete Integration',
@@ -689,6 +689,7 @@ const en = {
 		selectInstance: 'Select instance...',
 		grabbing: 'Grabbing...',
 		days: ' days',
+		weeks: ' weeks',
 		months: ' months',
 		years: ' years',
 		searchFailed: 'Search failed',
@@ -734,7 +735,7 @@ const en = {
 		noOrphans: 'No orphaned torrents found',
 		deselectAll: 'Deselect all',
 		selectAll: 'Select all',
-		selected: ' selected',
+		selectedCount: '{{selected}} of {{total}} selected',
 		deleteSelected: 'Delete Selected',
 		missingFiles: 'Missing files',
 		unregistered: 'Unregistered',
@@ -1004,6 +1005,7 @@ const en = {
 		selectAll: 'Select All',
 		deselectAll: 'Deselect All',
 		select: 'Select...',
+		selected: 'selected',
 	},
 
 	format: {

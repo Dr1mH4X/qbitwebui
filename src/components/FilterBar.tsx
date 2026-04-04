@@ -83,11 +83,11 @@ interface DropdownProps<T extends string> {
 	onChange: (v: T | null) => void
 	options: { value: T; label: string; count?: number }[]
 	placeholder: string
+	allLabel: string
 	Icon: FC<{ className?: string; strokeWidth?: number }>
 }
 
-function Dropdown<T extends string>({ value, onChange, options, placeholder, Icon }: DropdownProps<T>) {
-	const { t } = useTranslation()
+function Dropdown<T extends string>({ value, onChange, options, placeholder, allLabel, Icon }: DropdownProps<T>) {
 	const [open, setOpen] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
 	const close = useCallback(() => setOpen(false), [])
@@ -125,7 +125,7 @@ function Dropdown<T extends string>({ value, onChange, options, placeholder, Ico
 							backgroundColor: !value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
 						}}
 					>
-						{t('filters.all')} {placeholder}s
+						{allLabel}
 					</button>
 					{options.map((o) => (
 						<button
@@ -326,7 +326,14 @@ export function TrackerDropdown({ value, onChange, trackers }: TrackerDropdownPr
 		}
 	})
 	return (
-		<Dropdown value={value} onChange={onChange} options={options} placeholder={t('filters.tracker')} Icon={Repeat} />
+		<Dropdown
+			value={value}
+			onChange={onChange}
+			options={options}
+			placeholder={t('filters.tracker')}
+			allLabel={t('filters.allTrackers')}
+			Icon={Repeat}
+		/>
 	)
 }
 

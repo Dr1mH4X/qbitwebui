@@ -237,9 +237,7 @@ export function StatusBar() {
 					</button>
 				</div>
 				<span className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
-					{startItem}-{endItem}
-					{t('statusBar.of')}
-					{totalItems}
+					{t('statusBar.rangeOf', { start: startItem, end: endItem, total: totalItems })}
 				</span>
 				<div className="flex items-center gap-1">
 					<button

@@ -205,7 +205,7 @@ const zhCN = {
 		alt: '备用',
 		total: '总计',
 		dht: 'DHT',
-		of: ' / ',
+		rangeOf: '{{start}}-{{end}} / {{total}}',
 	},
 
 	instanceManager: {
@@ -674,8 +674,8 @@ const zhCN = {
 		added: '已添加！',
 		noInstances: '无实例',
 		grab: '抓取',
-		noResultsMatch: '没有匹配 "',
-		results: '" 的结果',
+		noResultsMatch: '没有匹配 "{{query}}" 的结果',
+		resultsCount: '{{count}} 条结果',
 		noResultsFound: '未找到结果',
 		addIntegration: '添加集成',
 		deleteIntegration: '删除集成',
@@ -689,6 +689,7 @@ const zhCN = {
 		selectInstance: '选择实例...',
 		grabbing: '抓取中...',
 		days: ' 天',
+		weeks: ' 周',
 		months: ' 月',
 		years: ' 年',
 		searchFailed: '搜索失败',
@@ -734,7 +735,7 @@ const zhCN = {
 		noOrphans: '未发现孤立种子',
 		deselectAll: '取消全选',
 		selectAll: '全选',
-		selected: ' 已选择',
+		selectedCount: '已选择 {{selected}}/{{total}}',
 		deleteSelected: '删除选中',
 		missingFiles: '文件缺失',
 		unregistered: '未注册',
@@ -1003,6 +1004,7 @@ const zhCN = {
 		selectAll: '全选',
 		deselectAll: '取消全选',
 		select: '选择...',
+		selected: '已选择',
 	},
 
 	format: {
