@@ -4,6 +4,7 @@ import { type Instance } from '../api/instances'
 import { formatSize, formatCountdown } from '../utils/format'
 import { Toggle, Select, MultiSelect } from '../components/ui'
 import { useCrossSeed, LOG_LEVEL_COLORS } from '../hooks/useCrossSeed'
+import { useI18n } from '../hooks/useI18n'
 
 interface Props {
 	instances: Instance[]
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode {
+	const { t } = useI18n()
 	const [showLogs, setShowLogs] = useState(false)
 	const {
 		selectedInstance,
@@ -46,7 +48,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 					<ChevronLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} strokeWidth={2} />
 				</button>
 				<h1 className="text-lg font-semibold flex-1" style={{ color: 'var(--text-primary)' }}>
-					Cross-Seed
+					{t('instanceManager.toolCards.crossSeed')}
 				</h1>
 				<a
 					href="https://github.com/Maciejonos/qbitwebui/issues"
@@ -55,7 +57,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 					className="px-2 py-1 rounded-lg border text-xs"
 					style={{ borderColor: 'var(--error)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
 				>
-					<span style={{ color: 'var(--error)' }}>Experimental</span>
+					<span style={{ color: 'var(--error)' }}>{t('crossSeed.experimental')}</span>
 				</a>
 			</header>
 
@@ -103,7 +105,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									color: 'var(--warning)',
 								}}
 							>
-								No Prowlarr integration configured
+								{t('crossSeed.noProwlarr')}
 							</div>
 						)}
 
@@ -112,20 +114,20 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 						>
 							<div className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-								Status
+								{t('crossSeed.status')}
 							</div>
 							<div className="grid grid-cols-2 gap-4 text-sm">
 								<div>
 									<div className="mb-1" style={{ color: 'var(--text-muted)' }}>
-										Scheduler
+										{t('crossSeed.scheduler')}
 									</div>
 									<div className="font-medium" style={{ color: status?.enabled ? '#a6e3a1' : 'var(--text-muted)' }}>
-										{status?.enabled ? 'On' : 'Off'}
+										{status?.enabled ? t('common.on') : t('common.off')}
 									</div>
 								</div>
 								<div>
 									<div className="mb-1" style={{ color: 'var(--text-muted)' }}>
-										Status
+										{t('crossSeed.status')}
 									</div>
 									<div
 										className="font-medium flex items-center gap-2"
@@ -137,20 +139,20 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 												style={{ backgroundColor: 'var(--accent)' }}
 											/>
 										)}
-										{isRunning ? 'Running' : 'Idle'}
+										{isRunning ? t('crossSeed.running') : t('crossSeed.idle')}
 									</div>
 								</div>
 								<div>
 									<div className="mb-1" style={{ color: 'var(--text-muted)' }}>
-										Next
+										{t('crossSeed.next')}
 									</div>
 									<div style={{ color: 'var(--text-secondary)' }}>
-										{status?.enabled ? formatCountdown(status?.nextRun ?? null) : '—'}
+										{status?.enabled ? formatCountdown(status?.nextRun ?? null) : t('common.dash')}
 									</div>
 								</div>
 								<div>
 									<div className="mb-1" style={{ color: 'var(--text-muted)' }}>
-										Cache
+										{t('crossSeed.cache')}
 									</div>
 									<div style={{ color: 'var(--text-secondary)' }}>
 										{cacheStats ? `${cacheStats.cache.count} (${formatSize(cacheStats.cache.totalSize)})` : '0'}
@@ -164,25 +166,25 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 						>
 							<div className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-								Configuration
+								{t('crossSeed.configuration')}
 							</div>
 
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Enabled
+									{t('common.enabled')}
 								</span>
 								<Toggle checked={config.enabled} onChange={(v) => setConfig({ ...config, enabled: v })} />
 							</div>
 
 							<div>
 								<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-									Prowlarr
+									{t('crossSeed.prowlarr')}
 								</label>
 								<Select
 									value={config.integration_id ? String(config.integration_id) : ''}
 									onChange={(v) => setConfig({ ...config, integration_id: v ? Number(v) : null, indexer_ids: [] })}
 									options={[
-										{ value: '', label: 'None' },
+										{ value: '', label: t('common.none') },
 										...prowlarrIntegrations.map((i) => ({ value: String(i.id), label: i.label })),
 									]}
 								/>
@@ -191,13 +193,14 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							{availableIndexers.length > 0 && (
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Indexers ({config.indexer_ids.length}/{availableIndexers.length})
+										{t('crossSeed.indexers')}
+										{config.indexer_ids.length}/{availableIndexers.length})
 									</label>
 									<MultiSelect
 										options={availableIndexers.map((idx) => ({ value: idx.id, label: idx.name }))}
 										selected={config.indexer_ids}
 										onChange={(ids) => setConfig({ ...config, indexer_ids: ids })}
-										placeholder="Select indexers..."
+										placeholder={t('crossSeed.selectIndexers')}
 									/>
 								</div>
 							)}
@@ -205,7 +208,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Interval (hours)
+										{t('crossSeed.interval')}
 									</label>
 									<input
 										type="number"
@@ -223,7 +226,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 								</div>
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Delay (30-3600s)
+										{t('crossSeed.delay')}
 									</label>
 									<input
 										type="number"
@@ -246,7 +249,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Category Suffix
+										{t('crossSeed.categorySuffix')}
 									</label>
 									<input
 										type="text"
@@ -262,7 +265,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 								</div>
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Tag
+										{t('crossSeed.tag')}
 									</label>
 									<input
 										type="text"
@@ -280,14 +283,14 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 
 							<div>
 								<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-									Match Mode
+									{t('crossSeed.matchMode')}
 								</label>
 								<Select
 									value={config.match_mode}
 									onChange={(v) => setConfig({ ...config, match_mode: v as 'strict' | 'flexible' })}
 									options={[
-										{ value: 'strict', label: 'Strict (names must match)' },
-										{ value: 'flexible', label: 'Flexible (sizes only)' },
+										{ value: 'strict', label: t('crossSeed.strict') },
+										{ value: 'flexible', label: t('crossSeed.flexible') },
 									]}
 									minWidth="100%"
 								/>
@@ -296,7 +299,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							{config.match_mode === 'flexible' && (
 								<div>
 									<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-										Link Directory
+										{t('crossSeed.linkDirectory')}
 									</label>
 									<input
 										type="text"
@@ -310,14 +313,14 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 										}}
 									/>
 									<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-										Hardlinks created when file names differ
+										{t('crossSeed.hardlinksHint')}
 									</p>
 								</div>
 							)}
 
 							<div>
 								<label className="block text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-									Blocklist (one per line)
+									{t('crossSeed.blocklist')}
 								</label>
 								<textarea
 									value={config.blocklist.join('\n')}
@@ -340,13 +343,13 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									}}
 								/>
 								<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-									Format: type:value
+									{t('crossSeed.blocklistFormat')}
 								</p>
 							</div>
 
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Include Single Episodes
+									{t('crossSeed.includeEpisodes')}
 								</span>
 								<Toggle
 									checked={config.include_single_episodes}
@@ -356,14 +359,14 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Dry Run
+									{t('crossSeed.dryRun')}
 								</span>
 								<Toggle checked={config.dry_run} onChange={(v) => setConfig({ ...config, dry_run: v })} />
 							</div>
 
 							<div className="flex items-center justify-between">
 								<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-									Skip Recheck
+									{t('crossSeed.skipRecheck')}
 								</span>
 								<Toggle checked={config.skip_recheck} onChange={(v) => setConfig({ ...config, skip_recheck: v })} />
 							</div>
@@ -374,7 +377,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 								className="w-full py-3 rounded-xl text-sm font-medium disabled:opacity-50"
 								style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 							>
-								{saving ? 'Saving...' : 'Save Configuration'}
+								{saving ? t('crossSeed.saving') : t('crossSeed.saveConfig')}
 							</button>
 						</div>
 
@@ -383,7 +386,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 							style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 						>
 							<div className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-								Actions
+								{t('crossSeed.actions')}
 							</div>
 							<div className="grid grid-cols-2 gap-3">
 								<button
@@ -392,7 +395,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									className="py-3 rounded-xl text-sm font-medium disabled:opacity-50"
 									style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
 								>
-									Scan
+									{t('crossSeed.scan')}
 								</button>
 								<button
 									onClick={() => handleScan(true)}
@@ -400,7 +403,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									className="py-3 rounded-xl text-sm border disabled:opacity-50"
 									style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 								>
-									Force Scan
+									{t('crossSeed.forceScan')}
 								</button>
 								<button
 									onClick={handleStop}
@@ -411,14 +414,14 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 										color: isRunning ? 'var(--error)' : 'var(--text-muted)',
 									}}
 								>
-									Stop
+									{t('crossSeed.stop')}
 								</button>
 								<button
 									onClick={handleClearCache}
 									className="py-3 rounded-xl text-sm border"
 									style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
 								>
-									Clear Torrents
+									{t('crossSeed.clearTorrents')}
 								</button>
 							</div>
 						</div>
@@ -429,7 +432,8 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 						>
 							<button onClick={() => setShowLogs(!showLogs)} className="w-full flex items-center justify-between">
 								<div className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-									Logs ({logs.length} entries)
+									{t('crossSeed.logs')} ({logs.length}
+									{t('crossSeed.entries')})
 								</div>
 								<ChevronDown
 									className={`w-4 h-4 transition-transform ${showLogs ? 'rotate-180' : ''}`}
@@ -442,7 +446,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									<div className="flex items-center justify-end">
 										<label className="flex items-center gap-2 cursor-pointer">
 											<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-												Auto-scroll
+												{t('crossSeed.autoScroll')}
 											</span>
 											<Toggle checked={autoScroll} onChange={setAutoScroll} />
 										</label>
@@ -454,7 +458,7 @@ export function MobileCrossSeedManager({ instances, onBack }: Props): ReactNode 
 									>
 										{logs.length === 0 ? (
 											<div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>
-												No logs
+												{t('crossSeed.noLogs')}
 											</div>
 										) : (
 											logs.map((log, i) => {

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { ChevronLeft, ArrowDown, ArrowUp, AlertCircle } from 'lucide-react'
 import { formatSize } from '../utils/format'
 import { useStats } from '../hooks/useStats'
+import { useI18n } from '../hooks/useI18n'
 
 interface Props {
 	onBack: () => void
@@ -9,6 +10,7 @@ interface Props {
 
 export function MobileStatistics({ onBack }: Props): ReactNode {
 	const { periodData, instances, selectedInstance, setSelectedInstance, isLoading, hasAnyData } = useStats()
+	const { t } = useI18n()
 
 	return (
 		<div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
@@ -20,7 +22,7 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 					<ChevronLeft className="w-6 h-6" />
 				</button>
 				<h1 className="text-lg font-semibold flex-1" style={{ color: 'var(--text-primary)' }}>
-					Statistics
+					{t('statistics.title')}
 				</h1>
 			</div>
 
@@ -35,7 +37,7 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 								color: selectedInstance === 'all' ? 'var(--accent-contrast)' : 'var(--text-secondary)',
 							}}
 						>
-							All
+							{t('statistics.allInstances')}
 						</button>
 						{instances.map((inst) => (
 							<button
@@ -75,8 +77,8 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 							>
 								<AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
 								<div>
-									<div className="font-medium">No data yet</div>
-									<div className="text-xs opacity-80 mt-0.5">Stats recorded every 5 min</div>
+									<div className="font-medium">{t('statistics.noData')}</div>
+									<div className="text-xs opacity-80 mt-0.5">{t('statistics.recordedEvery5Min')}</div>
 								</div>
 							</div>
 						)}
@@ -102,7 +104,7 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 													className="text-sm font-semibold tabular-nums"
 													style={{ color: data.hasData ? 'var(--accent)' : 'var(--text-muted)' }}
 												>
-													{data.hasData ? formatSize(data.downloaded) : 'N/A'}
+													{data.hasData ? formatSize(data.downloaded) : t('common.notAvailable')}
 												</span>
 											</div>
 											<div className="flex items-center gap-1.5">
@@ -111,7 +113,7 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 													className="text-sm font-semibold tabular-nums"
 													style={{ color: data.hasData ? '#a6e3a1' : 'var(--text-muted)' }}
 												>
-													{data.hasData ? formatSize(data.uploaded) : 'N/A'}
+													{data.hasData ? formatSize(data.uploaded) : t('common.notAvailable')}
 												</span>
 											</div>
 										</div>
@@ -121,10 +123,10 @@ export function MobileStatistics({ onBack }: Props): ReactNode {
 						</div>
 
 						<ul className="text-xs space-y-1 list-disc list-inside" style={{ color: 'var(--text-muted)' }}>
-							<li>Stats recorded every 5 minutes</li>
-							<li>All time values from qBittorrent</li>
-							<li>Other periods show difference from historical snapshots</li>
-							<li>Downloads include protocol traffic, not just file data</li>
+							<li>{t('statistics.recordedEvery5Min')}</li>
+							<li>{t('statistics.allTimeValues')}</li>
+							<li>{t('statistics.otherPeriods')}</li>
+							<li>{t('statistics.downloadStats')}</li>
 						</ul>
 					</>
 				)}

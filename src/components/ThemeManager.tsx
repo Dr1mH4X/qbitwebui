@@ -219,7 +219,7 @@ interface EditorViewProps {
 }
 
 function EditorView({ initialTheme, existingNames, onSave, onBack, t }: EditorViewProps) {
-	const [name, setName] = useState(initialTheme?.name ?? 'My Custom Theme')
+	const [name, setName] = useState(initialTheme?.name ?? t('theme.defaultThemeName'))
 	const [bgPrimary, setBgPrimary] = useState(initialTheme?.colors.bgPrimary ?? '#1e1e2e')
 	const [accent, setAccent] = useState(initialTheme?.colors.accent ?? '#cba6f7')
 	const [textPrimary, setTextPrimary] = useState(initialTheme?.colors.textPrimary ?? '#cdd6f4')
@@ -305,13 +305,13 @@ function EditorView({ initialTheme, existingNames, onSave, onBack, t }: EditorVi
 					>
 						<div className="flex justify-between items-center">
 							<div className="text-sm font-bold" style={{ color: previewColors.textPrimary }}>
-								{name || 'Theme Name'}
+								{name || t('theme.themeName')}
 							</div>
 							<div
 								className="px-2 py-0.5 rounded-full text-xs font-medium"
 								style={{ backgroundColor: previewColors.accent, color: previewColors.accentContrast }}
 							>
-								Badge
+								{t('theme.badge')}
 							</div>
 						</div>
 						<div
@@ -319,13 +319,13 @@ function EditorView({ initialTheme, existingNames, onSave, onBack, t }: EditorVi
 							style={{ backgroundColor: previewColors.bgSecondary, borderColor: previewColors.border }}
 						>
 							<div className="text-xs mb-2" style={{ color: previewColors.textSecondary }}>
-								Preview Card
+								{t('theme.previewCard')}
 							</div>
 							<button
 								className="w-full py-1.5 rounded-md text-xs font-medium"
 								style={{ backgroundColor: previewColors.accent, color: previewColors.accentContrast }}
 							>
-								Action
+								{t('theme.action')}
 							</button>
 						</div>
 					</div>
@@ -345,7 +345,7 @@ function EditorView({ initialTheme, existingNames, onSave, onBack, t }: EditorVi
 					disabled={!previewColors || !name.trim() || isNameTaken}
 					className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					Save Theme
+					{t('theme.saveTheme')}
 				</button>
 			</div>
 		</>

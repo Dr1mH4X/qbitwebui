@@ -5,32 +5,33 @@ import { Play, Pause, Trash2 } from 'lucide-react'
 import * as api from '../api/qbittorrent'
 import type { TorrentState } from '../types/qbittorrent'
 import { formatSize, formatSpeed, formatDate, formatDuration } from '../utils/format'
+import { useI18n } from '../hooks/useI18n'
 
 type Tab = 'general' | 'files' | 'trackers' | 'peers' | 'http'
 
 const PAUSED_STATES: TorrentState[] = ['pausedDL', 'pausedUP', 'stoppedDL', 'stoppedUP']
 
-function getTrackerStatus(status: number): string {
+function getTrackerStatus(status: number, t: (key: string) => string): string {
 	switch (status) {
 		case 2:
-			return 'Working'
+			return t('mobileDetail.working')
 		case 3:
-			return 'Updating'
+			return t('mobileDetail.updating')
 		case 4:
-			return 'Error'
+			return t('mobileDetail.error')
 		default:
-			return 'Disabled'
+			return t('mobileDetail.disabled')
 	}
 }
 
-function getPriorityLabel(priority: number): string {
+function getPriorityLabel(priority: number, t: (key: string) => string): string {
 	switch (priority) {
 		case 0:
-			return 'Skip'
+			return t('mobileDetail.skip')
 		case 1:
-			return 'Normal'
+			return t('mobileDetail.normal')
 		default:
-			return 'High'
+			return t('mobileDetail.high')
 	}
 }
 
@@ -41,6 +42,7 @@ interface Props {
 }
 
 export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props) {
+	const { t } = useI18n()
 	const [tab, setTab] = useState<Tab>('general')
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 	const [deleteFiles, setDeleteFiles] = useState(false)
@@ -115,15 +117,15 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 	}
 
 	const tabs: { id: Tab; label: string; count?: number }[] = [
-		{ id: 'general', label: 'General' },
-		{ id: 'files', label: 'Files', count: files?.length },
+		{ id: 'general', label: t('mobileDetail.general') },
+		{ id: 'files', label: t('mobileDetail.files'), count: files?.length },
 		{
 			id: 'trackers',
-			label: 'Trackers',
+			label: t('mobileDetail.trackers'),
 			count: trackers?.filter((t) => t.url.startsWith('http') || t.url.startsWith('udp')).length,
 		},
-		{ id: 'peers', label: 'Peers', count: peers.length },
-		{ id: 'http', label: 'HTTP', count: webSeeds?.length },
+		{ id: 'peers', label: t('mobileDetail.peers'), count: peers.length },
+		{ id: 'http', label: t('mobileDetail.http'), count: webSeeds?.length },
 	]
 
 	if (!torrent) {
@@ -157,7 +159,7 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 							>
 								{torrent.name}
 							</Drawer.Title>
-							<Drawer.Description className="sr-only">Torrent details</Drawer.Description>
+							<Drawer.Description className="sr-only">{t('torrentDetails.details')}</Drawer.Description>
 							<div className="flex items-center gap-2 mt-2">
 								<div
 									className="h-1.5 flex-1 rounded-full overflow-hidden"
@@ -190,12 +192,12 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 								{isPaused ? (
 									<>
 										<Play className="w-5 h-5" strokeWidth={2} />
-										Resume
+										{t('mobileDetail.resume')}
 									</>
 								) : (
 									<>
 										<Pause className="w-5 h-5" strokeWidth={2} />
-										Pause
+										{t('mobileDetail.pause')}
 									</>
 								)}
 							</button>
@@ -205,7 +207,7 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 								style={{ backgroundColor: 'color-mix(in srgb, var(--error) 15%, transparent)', color: 'var(--error)' }}
 							>
 								<Trash2 className="w-5 h-5" strokeWidth={2} />
-								Delete
+								{t('mobileDetail.delete')}
 							</button>
 						</div>
 
@@ -234,11 +236,11 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 						>
 							{tab === 'general' && (
 								<div className="space-y-3">
-									<InfoRow label="Size" value={formatSize(torrent.size)} />
-									<InfoRow label="Downloaded" value={formatSize(torrent.downloaded)} />
-									<InfoRow label="Uploaded" value={formatSize(torrent.uploaded)} />
+									<InfoRow label={t('mobileDetail.size')} value={formatSize(torrent.size)} />
+									<InfoRow label={t('mobileDetail.downloaded')} value={formatSize(torrent.downloaded)} />
+									<InfoRow label={t('mobileDetail.uploaded')} value={formatSize(torrent.uploaded)} />
 									<InfoRow
-										label="Ratio"
+										label={t('mobileDetail.ratio')}
 										value={
 											torrent.downloaded === 0 && torrent.progress >= 1 && torrent.size > 0
 												? '∞'
@@ -246,20 +248,26 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 										}
 									/>
 									<div className="h-px my-2" style={{ backgroundColor: 'var(--border)' }} />
-									<InfoRow label="Download Speed" value={formatSpeed(torrent.dlspeed)} accent />
-									<InfoRow label="Upload Speed" value={formatSpeed(torrent.upspeed)} accent="#a6e3a1" />
-									<InfoRow label="Seeds" value={`${torrent.num_seeds}`} />
-									<InfoRow label="Peers" value={`${torrent.num_leechs}`} />
+									<InfoRow label={t('mobileDetail.downloadSpeed')} value={formatSpeed(torrent.dlspeed)} accent />
+									<InfoRow
+										label={t('mobileDetail.uploadSpeed')}
+										value={formatSpeed(torrent.upspeed)}
+										accent="#a6e3a1"
+									/>
+									<InfoRow label={t('mobileDetail.seeds')} value={`${torrent.num_seeds}`} />
+									<InfoRow label={t('mobileDetail.peersCount')} value={`${torrent.num_leechs}`} />
 									<div className="h-px my-2" style={{ backgroundColor: 'var(--border)' }} />
-									<InfoRow label="Added" value={formatDate(torrent.added_on)} />
-									<InfoRow label="Completed" value={formatDate(torrent.completion_on)} />
-									<InfoRow label="Seeding Time" value={formatDuration(torrent.seeding_time)} />
-									<InfoRow label="Last Activity" value={formatDate(torrent.last_activity)} />
+									<InfoRow label={t('mobileDetail.added')} value={formatDate(torrent.added_on)} />
+									<InfoRow label={t('mobileDetail.completed')} value={formatDate(torrent.completion_on)} />
+									<InfoRow label={t('mobileDetail.seedingTime')} value={formatDuration(torrent.seeding_time)} />
+									<InfoRow label={t('mobileDetail.lastActivity')} value={formatDate(torrent.last_activity)} />
 									<div className="h-px my-2" style={{ backgroundColor: 'var(--border)' }} />
-									<InfoRow label="Category" value={torrent.category || '-'} />
-									<InfoRow label="Tags" value={torrent.tags || '-'} />
-									<InfoRow label="Save Path" value={torrent.save_path} small />
-									{properties?.comment && <InfoRow label="Comment" value={properties.comment} small />}
+									<InfoRow label={t('mobileDetail.category')} value={torrent.category || '-'} />
+									<InfoRow label={t('mobileDetail.tags')} value={torrent.tags || '-'} />
+									<InfoRow label={t('mobileDetail.savePath')} value={torrent.save_path} small />
+									{properties?.comment && (
+										<InfoRow label={t('mobileDetail.comment')} value={properties.comment} small />
+									)}
 								</div>
 							)}
 
@@ -290,13 +298,15 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 											</div>
 											<div className="flex items-center gap-3 mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
 												<span>{formatSize(file.size)}</span>
-												<span>Priority: {getPriorityLabel(file.priority)}</span>
+												<span>
+													{t('mobileDetail.priority')}: {getPriorityLabel(file.priority, t)}
+												</span>
 											</div>
 										</div>
 									))}
 									{(!files || files.length === 0) && (
 										<div className="py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-											No files
+											{t('mobileDetail.noFiles')}
 										</div>
 									)}
 								</div>
@@ -317,17 +327,21 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 												</div>
 												<div className="flex items-center gap-3 mt-2 text-xs">
 													<span style={{ color: tracker.status === 2 ? '#a6e3a1' : 'var(--text-muted)' }}>
-														{getTrackerStatus(tracker.status)}
+														{getTrackerStatus(tracker.status, t)}
 													</span>
-													<span style={{ color: 'var(--text-muted)' }}>Seeds: {tracker.num_seeds}</span>
-													<span style={{ color: 'var(--text-muted)' }}>Peers: {tracker.num_peers}</span>
+													<span style={{ color: 'var(--text-muted)' }}>
+														{t('mobileDetail.seeds')}: {tracker.num_seeds}
+													</span>
+													<span style={{ color: 'var(--text-muted)' }}>
+														{t('mobileDetail.peersCount')}: {tracker.num_peers}
+													</span>
 												</div>
 											</div>
 										))}
 									{(!trackers ||
 										trackers.filter((t) => t.url.startsWith('http') || t.url.startsWith('udp')).length === 0) && (
 										<div className="py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-											No trackers
+											{t('mobileDetail.noTrackers')}
 										</div>
 									)}
 								</div>
@@ -363,7 +377,7 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 									))}
 									{peers.length === 0 && (
 										<div className="py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-											No peers connected
+											{t('mobileDetail.noPeers')}
 										</div>
 									)}
 								</div>
@@ -384,7 +398,7 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 									))}
 									{(!webSeeds || webSeeds.length === 0) && (
 										<div className="py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-											No HTTP sources
+											{t('mobileDetail.noHttpSources')}
 										</div>
 									)}
 								</div>
@@ -406,10 +420,10 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 					>
 						<h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-							Delete Torrent
+							{t('mobileDetail.deleteTorrent')}
 						</h3>
 						<p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-							Are you sure you want to delete this torrent?
+							{t('mobileDetail.confirmDelete')}
 						</p>
 						<label className="flex items-center gap-3 mb-5 cursor-pointer">
 							<input
@@ -419,7 +433,7 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 								className="w-5 h-5 rounded"
 							/>
 							<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-								Also delete files from disk
+								{t('mobileDetail.alsoDeleteFiles')}
 							</span>
 						</label>
 						<div className="flex gap-3">
@@ -428,14 +442,14 @@ export function MobileTorrentDetail({ torrentHash, instanceId, onClose }: Props)
 								className="flex-1 py-3 rounded-xl text-sm font-medium"
 								style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
 							>
-								Cancel
+								{t('mobileDetail.cancel')}
 							</button>
 							<button
 								onClick={handleDelete}
 								className="flex-1 py-3 rounded-xl text-sm font-medium"
 								style={{ backgroundColor: 'var(--error)', color: 'var(--accent-contrast)' }}
 							>
-								Delete
+								{t('mobileDetail.delete')}
 							</button>
 						</div>
 					</div>

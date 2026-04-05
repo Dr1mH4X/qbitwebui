@@ -25,6 +25,7 @@ import {
 	formatRelativeDate,
 	normalizeSearch,
 } from '../utils/format'
+import { useI18n } from '../hooks/useI18n'
 
 type TorrentWithInstance = Torrent & { instanceId: number; instanceLabel: string }
 
@@ -45,22 +46,24 @@ const PAUSED_STATES: TorrentState[] = ['pausedDL', 'pausedUP', 'stoppedDL', 'sto
 
 type StateInfo = { color: string; label: string; icon: 'download' | 'upload' | 'pause' | 'error' | 'check' }
 
-const STATE_INFO: Partial<Record<TorrentState, StateInfo>> = {
-	stalledDL: { color: 'var(--warning)', label: 'Stalled', icon: 'download' },
-	queuedDL: { color: 'var(--text-muted)', label: 'Queued', icon: 'download' },
-	checkingDL: { color: 'var(--accent)', label: 'Checking', icon: 'check' },
-	stalledUP: { color: '#a6e3a1', label: 'Seeding', icon: 'upload' },
-	queuedUP: { color: 'var(--text-muted)', label: 'Queued', icon: 'upload' },
-	checkingUP: { color: '#a6e3a1', label: 'Checking', icon: 'check' },
-	error: { color: 'var(--error)', label: 'Error', icon: 'error' },
-	missingFiles: { color: 'var(--error)', label: 'Error', icon: 'error' },
-}
-
-function getStateInfo(state: TorrentState): StateInfo {
-	if (STATE_INFO[state]) return STATE_INFO[state]
-	if (DOWNLOADING_STATES.includes(state)) return { color: 'var(--accent)', label: 'Downloading', icon: 'download' }
-	if (SEEDING_STATES.includes(state)) return { color: '#a6e3a1', label: 'Seeding', icon: 'upload' }
-	if (PAUSED_STATES.includes(state)) return { color: 'var(--text-muted)', label: 'Paused', icon: 'pause' }
+function getStateInfo(state: TorrentState, t: (key: string) => string): StateInfo {
+	const stateInfo: Partial<Record<TorrentState, { color: string; labelKey: string; icon: StateInfo['icon'] }>> = {
+		stalledDL: { color: 'var(--warning)', labelKey: 'torrentRow.stalled', icon: 'download' },
+		queuedDL: { color: 'var(--text-muted)', labelKey: 'torrentRow.queued', icon: 'download' },
+		checkingDL: { color: 'var(--accent)', labelKey: 'torrentRow.checking', icon: 'check' },
+		stalledUP: { color: '#a6e3a1', labelKey: 'torrentRow.seeding', icon: 'upload' },
+		queuedUP: { color: 'var(--text-muted)', labelKey: 'torrentRow.queued', icon: 'upload' },
+		checkingUP: { color: '#a6e3a1', labelKey: 'torrentRow.checking', icon: 'check' },
+		error: { color: 'var(--error)', labelKey: 'torrentRow.error', icon: 'error' },
+		missingFiles: { color: 'var(--error)', labelKey: 'torrentRow.missing', icon: 'error' },
+	}
+	const info = stateInfo[state]
+	if (info) return { color: info.color, label: t(info.labelKey), icon: info.icon }
+	if (DOWNLOADING_STATES.includes(state))
+		return { color: 'var(--accent)', label: t('torrentRow.downloading'), icon: 'download' }
+	if (SEEDING_STATES.includes(state)) return { color: '#a6e3a1', label: t('torrentRow.seeding'), icon: 'upload' }
+	if (PAUSED_STATES.includes(state))
+		return { color: 'var(--text-muted)', label: t('torrentRow.stopped'), icon: 'pause' }
 	return { color: 'var(--text-muted)', label: state, icon: 'pause' }
 }
 
@@ -152,27 +155,28 @@ interface Props {
 	onSelectTorrent: (hash: string, instanceId: number) => void
 }
 
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-	{ value: 'all', label: 'All' },
-	{ value: 'downloading', label: 'Downloading' },
-	{ value: 'seeding', label: 'Seeding' },
-	{ value: 'paused', label: 'Paused' },
-]
-
-const SORT_OPTIONS: { value: SortField; label: string }[] = [
-	{ value: 'added_on', label: 'Added' },
-	{ value: 'dlspeed', label: 'Down Speed' },
-	{ value: 'upspeed', label: 'Up Speed' },
-	{ value: 'ratio', label: 'Ratio' },
-	{ value: 'seeding_time', label: 'Seed Time' },
-	{ value: 'last_activity', label: 'Last Active' },
-]
-
 export function MobileTorrentList({ instances, search, compact, onToggleCompact, onSelectTorrent }: Props) {
+	const { t } = useI18n()
 	const [status, setStatus] = useState<StatusFilter>('all')
 	const [sortBy, setSortBy] = useState<SortField>('added_on')
 	const [swipedHash, setSwipedHash] = useState<string | null>(null)
 	const queryClient = useQueryClient()
+
+	const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+		{ value: 'all', label: t('common.all') },
+		{ value: 'downloading', label: t('torrentRow.downloading') },
+		{ value: 'seeding', label: t('torrentRow.seeding') },
+		{ value: 'paused', label: t('torrentRow.stopped') },
+	]
+
+	const SORT_OPTIONS: { value: SortField; label: string }[] = [
+		{ value: 'added_on', label: t('columns.added_on') },
+		{ value: 'dlspeed', label: t('columns.dlspeed') },
+		{ value: 'upspeed', label: t('columns.upspeed') },
+		{ value: 'ratio', label: t('columns.ratio') },
+		{ value: 'seeding_time', label: t('columns.seeding_time') },
+		{ value: 'last_activity', label: t('columns.last_activity') },
+	]
 
 	const torrentQueries = useQueries({
 		queries: instances.map((instance) => ({
@@ -262,7 +266,7 @@ export function MobileTorrentList({ instances, search, compact, onToggleCompact,
 			{isLoading ? (
 				<div className="py-12 text-center">
 					<div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-						Loading torrents...
+						{t('common.loading')}
 					</div>
 				</div>
 			) : filteredTorrents.length === 0 ? (
@@ -276,13 +280,13 @@ export function MobileTorrentList({ instances, search, compact, onToggleCompact,
 						strokeWidth={1}
 					/>
 					<div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-						No torrents found
+						{t('torrentList.noTorrents')}
 					</div>
 				</div>
 			) : (
 				<div className={compact ? 'space-y-1' : 'space-y-2'}>
 					{filteredTorrents.map((torrent) => {
-						const stateInfo = getStateInfo(torrent.state)
+						const stateInfo = getStateInfo(torrent.state, t)
 						const isPaused = PAUSED_STATES.includes(torrent.state)
 						const isSwiped = swipedHash === torrent.hash
 						const speed =

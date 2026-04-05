@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { Palette, Settings, Check } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
+import { useI18n } from '../hooks/useI18n'
 import { MobileThemeManager } from './MobileThemeManager'
 
 export function MobileThemeSwitcher() {
 	const { theme, setTheme, themes, customThemes } = useTheme()
+	const { t } = useI18n()
 	const [open, setOpen] = useState(false)
 	const [showManager, setShowManager] = useState(false)
 	const ref = useRef<HTMLDivElement>(null)
@@ -36,15 +38,15 @@ export function MobileThemeSwitcher() {
 						>
 							{/* Official Themes */}
 							<div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider opacity-50 select-none text-[var(--text-muted)]">
-								Official
+								{t('theme.official')}
 							</div>
-							{themes.map((t) => (
+							{themes.map((theme_) => (
 								<ThemeRow
-									key={t.id}
-									t={t}
-									isActive={theme.id === t.id}
+									key={theme_.id}
+									t={theme_}
+									isActive={theme.id === theme_.id}
 									onSelect={() => {
-										setTheme(t.id)
+										setTheme(theme_.id)
 										setOpen(false)
 									}}
 								/>
@@ -55,15 +57,15 @@ export function MobileThemeSwitcher() {
 								<>
 									<div className="border-t border-[var(--border)]" />
 									<div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider opacity-50 select-none text-[var(--text-muted)]">
-										Custom
+										{t('theme.custom')}
 									</div>
-									{customThemes.map((t) => (
+									{customThemes.map((ct) => (
 										<ThemeRow
-											key={t.id}
-											t={t}
-											isActive={theme.id === t.id}
+											key={ct.id}
+											t={ct}
+											isActive={theme.id === ct.id}
 											onSelect={() => {
-												setTheme(t.id)
+												setTheme(ct.id)
 												setOpen(false)
 											}}
 										/>
@@ -82,7 +84,7 @@ export function MobileThemeSwitcher() {
 								style={{ color: 'var(--text-secondary)' }}
 							>
 								<Settings className="w-4 h-4" strokeWidth={2} />
-								Manage Themes
+								{t('theme.manageThemes')}
 							</button>
 						</div>
 					</>

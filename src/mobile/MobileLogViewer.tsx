@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, SlidersHorizontal, RefreshCw, Server, FileText } from 'lucide-react'
 import { type Instance } from '../api/instances'
 import { getLog, getPeerLog, type LogEntry, type PeerLogEntry } from '../api/qbittorrent'
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function MobileLogViewer({ instances, onBack }: Props) {
+	const { t } = useTranslation()
 	const [selectedInstance, setSelectedInstance] = useState<number>(instances[0]?.id ?? 0)
 	const [tab, setTab] = useState<LogTab>('main')
 	const [mainLogs, setMainLogs] = useState<LogEntry[]>([])
@@ -138,12 +140,12 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 				</button>
 				<div className="flex-1">
 					<h1 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-						Log Viewer
+						{t('logViewer.title')}
 					</h1>
 					{autoRefresh && (
 						<span className="text-xs flex items-center gap-1" style={{ color: 'var(--accent)' }}>
 							<span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
-							Live
+							{t('logViewer.live')}
 						</span>
 					)}
 				</div>
@@ -182,7 +184,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 				>
 					<div className="space-y-2">
 						<label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Instance
+							{t('logViewer.instance')}
 						</label>
 						<select
 							value={selectedInstance}
@@ -204,12 +206,12 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 
 					<div className="space-y-2">
 						<label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-							Sort Order
+							{t('logViewer.sort')}
 						</label>
 						<div className="flex gap-2">
 							{[
-								{ value: 'newest' as const, label: 'Newest first' },
-								{ value: 'oldest' as const, label: 'Oldest first' },
+								{ value: 'newest' as const, label: t('logViewer.newestFirst') },
+								{ value: 'oldest' as const, label: t('logViewer.oldestFirst') },
 							].map((opt) => (
 								<button
 									key={opt.value}
@@ -232,7 +234,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 						<div className="space-y-2">
 							<div className="flex items-center justify-between">
 								<label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-									Log Types
+									{t('logViewer.types')}
 								</label>
 								{activeFilterCount < 4 && (
 									<button
@@ -240,7 +242,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 										className="text-xs"
 										style={{ color: 'var(--accent)' }}
 									>
-										Reset
+										{t('logViewer.reset')}
 									</button>
 								)}
 							</div>
@@ -270,7 +272,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 
 					<div className="flex items-center justify-between pt-2">
 						<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
-							Auto-refresh
+							{t('logViewer.autoRefresh')}
 						</span>
 						<div
 							className="w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer"
@@ -293,18 +295,18 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 				className="flex items-center gap-1 p-1.5 mx-4 my-2 rounded-lg"
 				style={{ backgroundColor: 'var(--bg-tertiary)' }}
 			>
-				{(['main', 'peers'] as const).map((t) => (
+				{(['main', 'peers'] as const).map((tabKey) => (
 					<button
-						key={t}
-						onClick={() => setTab(t)}
+						key={tabKey}
+						onClick={() => setTab(tabKey)}
 						className="flex-1 px-4 py-2 text-sm font-medium transition-all rounded-md"
 						style={{
-							backgroundColor: tab === t ? 'var(--bg-secondary)' : 'transparent',
-							color: tab === t ? 'var(--text-primary)' : 'var(--text-muted)',
-							boxShadow: tab === t ? '0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border)' : 'none',
+							backgroundColor: tab === tabKey ? 'var(--bg-secondary)' : 'transparent',
+							color: tab === tabKey ? 'var(--text-primary)' : 'var(--text-muted)',
+							boxShadow: tab === tabKey ? '0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border)' : 'none',
 						}}
 					>
-						{t === 'main' ? 'Application' : 'Peers'}
+						{tabKey === 'main' ? t('logViewer.application') : t('logViewer.peers')}
 					</button>
 				))}
 			</div>
@@ -314,17 +316,17 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 					<div className="text-center py-16">
 						<Server className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} strokeWidth={1} />
 						<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-							No instances
+							{t('logViewer.noInstances')}
 						</p>
 					</div>
 				) : logCount === 0 && !loading ? (
 					<div className="text-center py-16">
 						<FileText className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} strokeWidth={1} />
 						<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-							No logs
+							{t('logViewer.noLogs')}
 						</p>
 						<p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-							{tab === 'main' && activeFilterCount < 4 ? 'Adjust filters' : 'Pull to refresh'}
+							{tab === 'main' && activeFilterCount < 4 ? t('logViewer.tryAdjusting') : t('logViewer.pullToRefresh')}
 						</p>
 					</div>
 				) : (
@@ -357,7 +359,9 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 														className="px-2 py-0.5 rounded text-xs font-medium"
 														style={{ backgroundColor: typeInfo.bg, color: typeInfo.color }}
 													>
-														{typeInfo.label}
+														{t(
+															`logViewer.${typeInfo.label.toLowerCase() as 'normal' | 'info' | 'warning' | 'critical'}`
+														)}
 													</span>
 												</div>
 												<p className="text-sm break-words font-mono" style={{ color: 'var(--text-primary)' }}>
@@ -398,7 +402,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 															color: entry.blocked ? 'var(--error)' : 'var(--accent)',
 														}}
 													>
-														{entry.blocked ? 'Blocked' : 'Connected'}
+														{entry.blocked ? t('logViewer.blocked') : t('logViewer.connected')}
 													</span>
 												</div>
 												<p className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>
@@ -422,7 +426,10 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 					className="px-4 py-2 text-xs border-t flex items-center justify-between"
 					style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 				>
-					<span>{logCount} entries</span>
+					<span>
+						{logCount}
+						{t('logViewer.entries')}
+					</span>
 					<span>{instances.find((i) => i.id === selectedInstance)?.label}</span>
 				</div>
 			)}

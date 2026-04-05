@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
-import { Download, Plus, Wrench, Zap, User, LogOut, Search, X, Server } from 'lucide-react'
+import { Download, Plus, Wrench, Zap, User, LogOut, Search, X, Server, Globe, Check } from 'lucide-react'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { getInstances, type Instance } from '../api/instances'
 import { logout } from '../api/auth'
@@ -9,6 +9,7 @@ import { MobileStats } from './MobileStats'
 import { MobileTorrentList } from './MobileTorrentList'
 import { MobileThemeSwitcher } from './MobileThemeSwitcher'
 import { InstanceProvider } from '../contexts/InstanceContext.tsx'
+import { useI18n } from '../hooks/useI18n'
 
 const MobileTorrentDetail = lazy(() =>
 	import('./MobileTorrentDetail').then((m) => ({ default: m.MobileTorrentDetail }))
@@ -122,9 +123,16 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 	const [activeTool, setActiveTool] = useState<Tool>(() => parseHash().tool)
 	const [compactMode, setCompactMode] = useState(() => localStorage.getItem('mobileCompactMode') === 'true')
 	const [showAddModal, setShowAddModal] = useState(false)
+	const [langMenuOpen, setLangMenuOpen] = useState(false)
 	const searchInputRef = useRef<HTMLInputElement>(null)
 	const effectiveInstance = selectedInstance !== 'all' ? selectedInstance : instances.length === 1 ? instances[0] : null
 	const altSpeed = useAltSpeedMode(effectiveInstance?.id ?? null)
+	const { t, locale, setLocale } = useI18n()
+
+	const languages = [
+		{ code: 'en', label: t('locales.en') },
+		{ code: 'zh-CN', label: t('locales.zh') },
+	]
 
 	const handleMainTabChange = useCallback(
 		(tab: MainTab) => {
@@ -193,7 +201,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 						<Download className="w-5 h-5 animate-pulse" style={{ color: 'var(--accent-contrast)' }} strokeWidth={2.5} />
 					</div>
 					<span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-						Loading...
+						{t('common.loading')}
 					</span>
 				</div>
 			</div>
@@ -213,10 +221,10 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 					<Server className="w-8 h-8" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
 				</div>
 				<h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-					No Instances
+					{t('instanceManager.noInstances')}
 				</h2>
 				<p className="text-sm text-center mb-6" style={{ color: 'var(--text-muted)' }}>
-					Add a qBittorrent instance using the desktop version to get started.
+					{t('instanceManager.addFirstInstance')}
 				</p>
 				{!authDisabled && (
 					<button
@@ -224,7 +232,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 						className="px-6 py-3 rounded-xl text-sm font-medium"
 						style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
 					>
-						Logout
+						{t('header.logout')}
 					</button>
 				)}
 			</div>
@@ -249,7 +257,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 							)}
 							{mainTab === 'tools' && (
 								<span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-									Tools
+									{t('header.tools')}
 								</span>
 							)}
 						</div>
@@ -273,6 +281,45 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 									/>
 								</button>
 							)}
+							<div className="relative">
+								<button
+									onClick={() => setLangMenuOpen(!langMenuOpen)}
+									className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+									style={{ backgroundColor: 'var(--bg-secondary)' }}
+								>
+									<Globe className="w-5 h-5" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
+								</button>
+								{langMenuOpen && (
+									<>
+										<div className="fixed inset-0 z-40" onClick={() => setLangMenuOpen(false)} />
+										<div
+											className="absolute right-0 top-full mt-2 z-50 min-w-[140px] rounded-xl border shadow-xl overflow-hidden"
+											style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+										>
+											{languages.map((lang) => (
+												<button
+													key={lang.code}
+													onClick={() => {
+														setLocale(lang.code)
+														setLangMenuOpen(false)
+													}}
+													className="w-full flex items-center gap-3 px-4 py-3 text-left active:bg-[var(--bg-tertiary)] transition-colors"
+													style={{
+														backgroundColor:
+															locale === lang.code
+																? 'color-mix(in srgb, var(--accent) 10%, transparent)'
+																: 'transparent',
+														color: locale === lang.code ? 'var(--accent)' : 'var(--text-primary)',
+													}}
+												>
+													<span className="text-sm font-medium">{lang.label}</span>
+													{locale === lang.code && <Check className="w-4 h-4 ml-auto shrink-0" strokeWidth={3} />}
+												</button>
+											))}
+										</div>
+									</>
+								)}
+							</div>
 							<MobileThemeSwitcher />
 							{!authDisabled && (
 								<div className="relative">
@@ -304,7 +351,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 													style={{ color: 'var(--error)' }}
 												>
 													<LogOut className="w-4 h-4" strokeWidth={1.5} />
-													Logout
+													{t('header.logout')}
 												</button>
 											</div>
 										</>
@@ -336,7 +383,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 									onChange={(e) => setSearch(e.target.value)}
 									onFocus={() => setSearchFocused(true)}
 									onBlur={() => setSearchFocused(false)}
-									placeholder="Search torrents..."
+									placeholder={t('filters.searchPlaceholder')}
 									className="flex-1 bg-transparent outline-none"
 									style={{ color: 'var(--text-primary)', fontSize: '16px' }}
 								/>
@@ -399,7 +446,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 							style={{ color: mainTab === 'torrents' ? 'var(--accent)' : 'var(--text-muted)' }}
 						>
 							<Download className="w-6 h-6" strokeWidth={mainTab === 'torrents' ? 2 : 1.5} />
-							<span className="text-xs font-medium">Torrents</span>
+							<span className="text-xs font-medium">{t('filters.all')}</span>
 						</button>
 						<button
 							onClick={() => setShowAddModal(true)}
@@ -407,7 +454,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 							style={{ color: 'var(--text-muted)' }}
 						>
 							<Plus className="w-6 h-6" strokeWidth={1.5} />
-							<span className="text-xs font-medium">Add</span>
+							<span className="text-xs font-medium">{t('common.add')}</span>
 						</button>
 						<button
 							onClick={() => handleMainTabChange('tools')}
@@ -415,7 +462,7 @@ export function MobileApp({ username, onLogout, authDisabled }: Props) {
 							style={{ color: mainTab === 'tools' ? 'var(--accent)' : 'var(--text-muted)' }}
 						>
 							<Wrench className="w-6 h-6" strokeWidth={mainTab === 'tools' ? 2 : 1.5} />
-							<span className="text-xs font-medium">Tools</span>
+							<span className="text-xs font-medium">{t('header.tools')}</span>
 						</button>
 					</div>
 				</nav>

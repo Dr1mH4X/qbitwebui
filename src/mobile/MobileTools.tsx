@@ -11,6 +11,7 @@ import {
 	Network,
 } from 'lucide-react'
 import { type Instance } from '../api/instances'
+import { useI18n } from '../hooks/useI18n'
 
 const MobileSearchPanel = lazy(() => import('./MobileSearchPanel').then((m) => ({ default: m.MobileSearchPanel })))
 const MobileFileBrowser = lazy(() => import('./MobileFileBrowser').then((m) => ({ default: m.MobileFileBrowser })))
@@ -47,6 +48,7 @@ interface Props {
 }
 
 export function MobileTools({ instances, activeTool, onToolChange }: Props): ReactNode {
+	const { t } = useI18n()
 	const [filesEnabled, setFilesEnabled] = useState(false)
 
 	useEffect(() => {
@@ -125,10 +127,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Prowlarr Search
+							{t('instanceManager.toolCards.prowlarr')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							Search indexers and grab releases
+							{t('instanceManager.toolCards.prowlarrDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -150,10 +152,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 						</div>
 						<div className="flex-1 min-w-0">
 							<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-								File Browser
+								{t('instanceManager.toolCards.fileBrowser')}
 							</h3>
 							<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-								Browse, download, and manage files
+								{t('instanceManager.toolCards.fileBrowserDesc')}
 							</p>
 						</div>
 						<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -175,10 +177,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Orphan Manager
+							{t('instanceManager.toolCards.orphanManager')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							Find torrents with missing files
+							{t('instanceManager.toolCards.orphanManagerDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -199,10 +201,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							RSS Manager
+							{t('instanceManager.toolCards.rssManager')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							Manage feeds and auto-download rules
+							{t('instanceManager.toolCards.rssManagerDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -223,10 +225,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Log Viewer
+							{t('instanceManager.toolCards.logViewer')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							View application and peer logs
+							{t('instanceManager.toolCards.logViewerDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -238,7 +240,7 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 				className="w-full p-4 rounded-2xl border text-left active:scale-[0.98] transition-transform relative"
 				style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 			>
-				<span className="absolute top-3 right-3" title="Experimental feature">
+				<span className="absolute top-3 right-3" title={t('instanceManager.toolCards.experimentalFeature')}>
 					<AlertTriangle className="w-6 h-6" style={{ color: 'var(--error)' }} />
 				</span>
 				<div className="flex items-start gap-4">
@@ -250,10 +252,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Cross-Seed
+							{t('instanceManager.toolCards.crossSeed')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							Find matching torrents across trackers
+							{t('instanceManager.toolCards.crossSeedDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -274,10 +276,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Statistics
+							{t('instanceManager.toolCards.statistics')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							View transfer history over time
+							{t('instanceManager.toolCards.statisticsDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
@@ -298,10 +300,10 @@ export function MobileTools({ instances, activeTool, onToolChange }: Props): Rea
 					</div>
 					<div className="flex-1 min-w-0">
 						<h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-							Network Tools
+							{t('instanceManager.toolCards.network')}
 						</h3>
 						<p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-							Run diagnostics from your instance
+							{t('instanceManager.toolCards.networkDesc')}
 						</p>
 					</div>
 					<ChevronRight className="w-5 h-5 mt-1 shrink-0" style={{ color: 'var(--text-muted)' }} />
