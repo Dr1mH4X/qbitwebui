@@ -15,6 +15,7 @@ i18n
 	.init({
 		resources,
 		fallbackLng: 'en',
+		supportedLngs: ['en', 'zh-CN'],
 		interpolation: { escapeValue: false },
 		detection: {
 			order: ['localStorage', 'navigator'],

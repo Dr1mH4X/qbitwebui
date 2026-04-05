@@ -8,7 +8,7 @@ type StateType = 'accent' | 'warning' | 'muted' | 'info' | 'error'
 
 function getStateInfo(
 	state: TorrentState,
-	t: (key: string) => string
+	t: (key: string, options?: Record<string, unknown>) => string
 ): { label: string; type: StateType; isDownloading: boolean } {
 	const map: Record<TorrentState, { label: string; type: StateType; isDownloading: boolean }> = {
 		downloading: { label: t('torrentRow.downloading'), type: 'accent', isDownloading: true },
@@ -82,7 +82,12 @@ interface CellContext {
 	isCrossSeed: boolean
 }
 
-function renderCell(columnId: string, torrent: Torrent, ctx: CellContext, t: (key: string) => string): ReactNode {
+function renderCell(
+	columnId: string,
+	torrent: Torrent,
+	ctx: CellContext,
+	t: (key: string, options?: Record<string, unknown>) => string
+): ReactNode {
 	switch (columnId) {
 		case 'progress':
 			return ctx.isComplete ? (
@@ -118,8 +123,7 @@ function renderCell(columnId: string, torrent: Torrent, ctx: CellContext, t: (ke
 									color: 'var(--text-primary)',
 								}}
 							>
-								{t('torrentRow.eta')}
-								{formatEta(torrent.eta)}
+								{t('torrentRow.etaWithValue', { eta: formatEta(torrent.eta) })}
 							</div>
 						</div>
 					)}

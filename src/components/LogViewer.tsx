@@ -390,10 +390,7 @@ export function LogViewer({ instances }: Props) {
 						className="px-4 py-2 text-xs border-t flex items-center justify-between"
 						style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 					>
-						<span>
-							{logCount}
-							{t('logViewer.entries')}
-						</span>
+						<span>{t('logViewer.entriesCount', { count: logCount })}</span>
 						{autoRefresh && (
 							<span className="flex items-center gap-1.5">
 								<span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />

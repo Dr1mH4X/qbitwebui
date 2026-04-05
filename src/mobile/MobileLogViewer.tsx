@@ -426,10 +426,7 @@ export function MobileLogViewer({ instances, onBack }: Props) {
 					className="px-4 py-2 text-xs border-t flex items-center justify-between"
 					style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
 				>
-					<span>
-						{logCount}
-						{t('logViewer.entries')}
-					</span>
+					<span>{t('logViewer.entriesCount', { count: logCount })}</span>
 					<span>{instances.find((i) => i.id === selectedInstance)?.label}</span>
 				</div>
 			)}

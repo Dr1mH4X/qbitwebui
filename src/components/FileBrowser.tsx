@@ -353,8 +353,7 @@ export function FileBrowser({ enabled }: Props) {
 					style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
 				>
 					<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-						{selected.size}
-						{t('fileBrowser.selected')}
+						{t('fileBrowser.selectedCount', { count: selected.size })}
 					</span>
 					<div className="ml-auto flex items-center gap-2">
 						{selected.size === 1 && (

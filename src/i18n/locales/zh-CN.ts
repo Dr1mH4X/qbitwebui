@@ -192,6 +192,7 @@ const zhCN = {
 		unknown: '未知',
 		complete: '完成',
 		eta: '预计：',
+		etaWithValue: '预计：{{eta}}',
 	},
 
 	statusBar: {
@@ -719,6 +720,7 @@ const zhCN = {
 		howToConfigure: '如何配置',
 		refresh: '刷新',
 		selected: ' 已选择',
+		selectedCount: '已选择 {{count}} 项',
 		rename: '重命名',
 		move: '移动',
 		copy: '复制',
@@ -868,6 +870,7 @@ const zhCN = {
 		blocked: '已阻止',
 		connected: '已连接',
 		entries: ' 条',
+		entriesCount: '{{count}} 条',
 		live: '实时',
 		reset: '重置',
 		pullToRefresh: '下拉刷新',
@@ -1064,6 +1067,7 @@ const zhCN = {
 		deselectAll: '取消全选',
 		select: '选择...',
 		selected: '已选择',
+		selectedCount: '已选择 {{count}} 项',
 	},
 
 	format: {

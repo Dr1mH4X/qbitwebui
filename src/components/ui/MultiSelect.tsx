@@ -48,7 +48,7 @@ export function MultiSelect({ options, selected, onChange, placeholder }: MultiS
 		}
 	}
 
-	const displayText = selected.length === 0 ? displayPlaceholder : `${selected.length} ${t('multiSelect.selected')}`
+	const displayText = selected.length === 0 ? displayPlaceholder : t('multiSelect.selectedCount', { count: selected.length })
 
 	return (
 		<div ref={ref} className="relative">

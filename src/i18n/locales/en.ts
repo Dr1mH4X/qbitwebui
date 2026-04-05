@@ -192,6 +192,7 @@ const en = {
 		unknown: 'Unknown',
 		complete: 'Complete',
 		eta: 'ETA: ',
+		etaWithValue: 'ETA: {{eta}}',
 	},
 
 	statusBar: {
@@ -719,6 +720,8 @@ const en = {
 		howToConfigure: 'How to configure',
 		refresh: 'Refresh',
 		selected: ' selected',
+		selectedCount_one: '{{count}} selected',
+		selectedCount_other: '{{count}} selected',
 		rename: 'Rename',
 		move: 'Move',
 		copy: 'Copy',
@@ -868,6 +871,8 @@ const en = {
 		blocked: 'Blocked',
 		connected: 'Connected',
 		entries: ' entries',
+		entriesCount_one: '{{count}} entry',
+		entriesCount_other: '{{count}} entries',
 		live: 'Live',
 		reset: 'Reset',
 		pullToRefresh: 'Pull to refresh',
@@ -1065,6 +1070,8 @@ const en = {
 		deselectAll: 'Deselect All',
 		select: 'Select...',
 		selected: 'selected',
+		selectedCount_one: '{{count}} selected',
+		selectedCount_other: '{{count}} selected',
 	},
 
 	format: {
